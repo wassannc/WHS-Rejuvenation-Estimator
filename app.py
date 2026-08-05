@@ -13,9 +13,12 @@ st.title("🏗 WHS Rejuvenation Estimation System")
 # ---------------------------------------
 # Load Basic Information
 # ---------------------------------------
-
-odk = ODKCentral()
-basic = odk.get_basic_information()
+@st.cache_data(ttl=300)
+def load_basic_data():
+    odk = ODKCentral()
+    return odk.get_basic_information()
+    
+basic = load_basic_data()
 
 st.success(f"{len(basic)} structures loaded")
 
