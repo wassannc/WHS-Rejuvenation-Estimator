@@ -138,4 +138,11 @@ if st.button("📄 Generate Estimate", type="primary"):
 
     st.success("✅ Estimate workbook created successfully!")
 
+    import os
+
     st.write(f"Saved to: {output_file}")
+
+    if os.path.exists(output_file):
+        st.success("✅ File exists!")
+    else:
+        st.error("❌ File was NOT created.")
