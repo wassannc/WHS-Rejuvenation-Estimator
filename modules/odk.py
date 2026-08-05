@@ -1,15 +1,12 @@
 """
 ODK Central Data Module
------------------------
-This module is responsible for:
-1. Connecting to ODK Central
-2. Downloading submissions
-3. Returning clean pandas DataFrames
 """
 
 import requests
 import pandas as pd
+from io import StringIO
 from requests.auth import HTTPBasicAuth
+
 from config import (
     ODK_URL,
     USERNAME,
@@ -29,25 +26,30 @@ class ODKCentral:
 
     def get_form_data(self, form_id):
 
-    url = (
-        f"{self.base_url}/v1/projects/"
-        f"{self.project_id}/forms/{form_id}/submissions.csv"
-    )
-
-    response = requests.get(url, auth=self.auth)
-
-    if response.status_code != 200:
-        raise Exception(
-            f"ODK Error {response.status_code}\n"
-            f"{response.text}"
+        url = (
+            f"{self.base_url}/v1/projects/"
+            f"{self.project_id}/forms/{form_id}/submissions.csv"
         )
 
-    from io import StringIO
+        response = requests.get(url, auth=self.auth)
 
-    try:
-        return pd.read_csv(StringIO(response.text))
-    except Exception:
-        raise Exception(
-            "Unable to read CSV.\n\n"
-            + response.text[:500]
-        )
+        if response.status_code != 200:
+            raise Exception(
+                f"ODK Error {response.status_code}\n"
+                f"{response.text}"
+            )
+
+        try:
+            return pd.read_csv(StringIO(response.text))
+
+        except Exception:
+            raise Exception(
+                "Unable to read CSV\n\n"
+                + response.text[:500]
+            )
+
+    def get_basic_information(self):
+        return self.get_form_data(BASIC_FORM_ID)
+
+    def get_repairs(self):
+        return self.get_form_data(REPAIR_FORM_ID)
