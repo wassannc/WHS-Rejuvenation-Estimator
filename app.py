@@ -128,6 +128,14 @@ if st.button("📄 Generate Estimate", type="primary"):
 
     # Create estimate workbook
     estimator = EstimateGenerator()
+    # Convert selected structure into a dictionary
+    record = structure.to_dict()
+
+    # Populate Input Data Sheet-G
+    estimator.populate_sheet(
+        "Input Data Sheet-G",
+        record
+    )
 
     output_file = os.path.join(
         "output",
