@@ -112,6 +112,7 @@ st.divider()
 if st.button("📄 Generate Estimate", type="primary"):
 
     with st.spinner("Loading repair assessments..."):
+        odk = ODKCentral()
         repairs = odk.get_repairs()
 
     st.success(f"{len(repairs)} repair records downloaded")
