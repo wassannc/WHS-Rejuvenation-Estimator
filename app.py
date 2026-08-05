@@ -124,10 +124,3 @@ if st.button("📄 Generate Estimate", type="primary"):
     st.stop()
 
 st.write("---")
-
-st.write("### Selected Structure")
-
-st.write(f"**District :** {district}")
-st.write(f"**Block :** {block}")
-st.write(f"**GP :** {gp}")
-st.write(f"**Village :** {village}")
