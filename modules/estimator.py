@@ -11,7 +11,13 @@ from modules.mapper import FieldMapper
 
 class EstimateGenerator:
 
-    ...
+    def __init__(self):
+        self.workbook = load_workbook(TEMPLATE_FILE)
+        self.mapper = FieldMapper()
+
+    def write_value(self, sheet_name, cell, value):
+        sheet = self.workbook[sheet_name]
+        sheet[cell] = value
 
     def populate_sheet(self, sheet_name, record):
 
