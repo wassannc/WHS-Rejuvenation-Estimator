@@ -112,13 +112,11 @@ st.divider()
 if st.button("📄 Generate Estimate", type="primary"):
 
     with st.spinner("Loading repair assessments..."):
-
         repairs = odk.get_repairs()
 
     st.success(f"{len(repairs)} repair records downloaded")
 
     st.subheader("Repairs Form Columns")
-
     st.write(repairs.columns.tolist())
 
     st.dataframe(repairs.head())
