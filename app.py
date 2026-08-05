@@ -153,9 +153,15 @@ if st.button("📄 Generate Estimate", type="primary"):
 
     import os
 
-    st.write(f"Saved to: {output_file}")
-
     if os.path.exists(output_file):
-        st.success("✅ File exists!")
+        st.success("✅ File created successfully!")
+
+        with open(output_file, "rb") as f:
+            st.download_button(
+                label="📥 Download Estimate",
+                data=f,
+                file_name=f"{village}_Estimate.xlsx",
+                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            )
     else:
         st.error("❌ File was NOT created.")
