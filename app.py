@@ -128,6 +128,10 @@ if st.button("📄 Generate Estimate", type="primary"):
 
     # Create estimate workbook
     estimator = EstimateGenerator()
+    import inspect
+
+    st.code(inspect.getsource(EstimateGenerator))
+    st.stop()
     st.write("Estimator class:", type(estimator))
     st.write("Attributes:", estimator.__dict__)
     # Convert selected structure into a dictionary
