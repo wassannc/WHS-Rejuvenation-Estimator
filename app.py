@@ -85,6 +85,32 @@ village = st.selectbox(
     "Village",
     villages
 )
+st.divider()
+
+st.subheader("📋 Structure Information")
+
+structure = village_df[
+    village_df["geo-village"] == village
+].iloc[0]
+
+col1, col2 = st.columns(2)
+
+with col1:
+    st.write(f"**District:** {district}")
+    st.write(f"**Block:** {block}")
+    st.write(f"**GP:** {gp}")
+    st.write(f"**Village:** {village}")
+
+with col2:
+    st.write(f"**Latitude:** {structure['geo-village_gps-Latitude']}")
+    st.write(f"**Longitude:** {structure['geo-village_gps-Longitude']}")
+    st.write(f"**Altitude:** {structure['geo-village_gps-Altitude']}")
+
+st.info("Repairs: Not Loaded")
+st.divider()
+
+if st.button("📄 Generate Estimate", type="primary"):
+    st.success("Next step: Loading Repairs Form...")
 
 st.write("---")
 
