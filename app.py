@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 
 from modules.odk import ODKCentral
+from modules.estimator import EstimateGenerator
 
 st.set_page_config(
     page_title="WHS Rejuvenation Estimation System",
@@ -108,7 +109,7 @@ with col2:
 
 if st.button("📄 Generate Estimate", type="primary"):
 
-    from modules.estimator import EstimateGenerator
+    
     import os
 
     with st.spinner("Loading repair assessments..."):
