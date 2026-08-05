@@ -8,7 +8,7 @@ st.set_page_config(
     layout="wide"
 )
 
-st.title("🏗 WHS Rejuvenation Estimation System")
+st.title("WHS Rejuvenation Estimation")
 
 # ---------------------------------------
 # Load Basic Information
