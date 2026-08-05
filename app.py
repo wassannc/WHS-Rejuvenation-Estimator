@@ -10,14 +10,84 @@ st.set_page_config(
 
 st.title("🏗 WHS Rejuvenation Estimation System")
 
-if st.button("Connect to ODK"):
+# ---------------------------------------
+# Load Basic Information
+# ---------------------------------------
 
-    odk = ODKCentral()
+odk = ODKCentral()
+basic = odk.get_basic_information()
 
-    with st.spinner("Downloading Basic Information..."):
+st.success(f"{len(basic)} structures loaded")
 
-        basic = odk.get_basic_information()
+# ---------------------------------------
+# District
+# ---------------------------------------
 
-    st.success(f"{len(basic)} records downloaded")
+districts = sorted(
+    basic["geo-district"].dropna().unique()
+)
 
-    st.dataframe(basic.head())
+district = st.selectbox(
+    "District",
+    districts
+)
+
+# ---------------------------------------
+# Block
+# ---------------------------------------
+
+block_df = basic[
+    basic["geo-district"] == district
+]
+
+blocks = sorted(
+    block_df["geo-block"].dropna().unique()
+)
+
+block = st.selectbox(
+    "Block",
+    blocks
+)
+
+# ---------------------------------------
+# GP
+# ---------------------------------------
+
+gp_df = block_df[
+    block_df["geo-block"] == block
+]
+
+gps = sorted(
+    gp_df["geo-gp"].dropna().unique()
+)
+
+gp = st.selectbox(
+    "Gram Panchayat",
+    gps
+)
+
+# ---------------------------------------
+# Village
+# ---------------------------------------
+
+village_df = gp_df[
+    gp_df["geo-gp"] == gp
+]
+
+villages = sorted(
+    village_df["geo-village"].dropna().unique()
+)
+
+village = st.selectbox(
+    "Village",
+    villages
+)
+
+st.write("---")
+
+st.write("### Selected Structure")
+
+st.write(f"**District :** {district}")
+st.write(f"**Block :** {block}")
+st.write(f"**GP :** {gp}")
+st.write(f"**Village :** {village}")
