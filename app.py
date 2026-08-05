@@ -3,6 +3,7 @@ import pandas as pd
 
 from modules.odk import ODKCentral
 from modules.estimator import EstimateGenerator
+import os
 
 st.set_page_config(
     page_title="WHS Rejuvenation Estimation System",
@@ -108,9 +109,6 @@ with col2:
     st.write(f"**Altitude:** {structure['geo-village_gps-Altitude']}")
 
 if st.button("📄 Generate Estimate", type="primary"):
-
-    
-    import os
 
     with st.spinner("Loading repair assessments..."):
 
