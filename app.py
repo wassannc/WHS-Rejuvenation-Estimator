@@ -106,9 +106,6 @@ with col2:
     st.write(f"**Longitude:** {structure['geo-village_gps-Longitude']}")
     st.write(f"**Altitude:** {structure['geo-village_gps-Altitude']}")
 
-st.info("Repairs: Not Loaded")
-st.divider()
-
 if st.button("📄 Generate Estimate", type="primary"):
 
     with st.spinner("Loading repair assessments..."):
