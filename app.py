@@ -131,11 +131,16 @@ if st.button("📄 Generate Estimate", type="primary"):
     # Convert selected structure into a dictionary
     record = structure.to_dict()
 
-    # Populate Input Data Sheet-G
-    estimator.populate_sheet(
-        "Input Data Sheet-G",
-        record
-    )
+    try:
+        estimator.populate_sheet(
+            "Input Data Sheet-G",
+            record
+        )
+        st.success("✅ Input Data Sheet-G populated")
+
+    except Exception as e:
+        st.error(f"Populate Error: {e}")
+        st.stop()
 
     output_file = os.path.join(
         "output",
