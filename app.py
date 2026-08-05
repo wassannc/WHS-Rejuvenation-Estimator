@@ -136,6 +136,7 @@ if st.button("📄 Generate Estimate", type="primary"):
             "Input Data Sheet-G",
             record
         )
+        estimator.write_fixed_values()
         st.success("✅ Input Data Sheet-G populated")
 
     except Exception as e:
