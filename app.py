@@ -108,17 +108,34 @@ with col2:
 
 if st.button("📄 Generate Estimate", type="primary"):
 
+    from modules.estimator import EstimateGenerator
+    import os
+
     with st.spinner("Loading repair assessments..."):
+
         odk = ODKCentral()
         repairs = odk.get_repairs()
 
-    st.success(f"{len(repairs)} repair records downloaded")
+    # Filter repair records for selected structure
+    village_repairs = repairs[
+        (repairs["basic_details_repairs-district"] == district) &
+        (repairs["basic_details_repairs-block"] == block) &
+        (repairs["basic_details_repairs-gp"] == gp) &
+        (repairs["basic_details_repairs-village"] == village)
+    ]
 
-    st.subheader("Repairs Form Columns")
-    st.write(repairs.columns.tolist())
+    st.success(f"Found {len(village_repairs)} repair record(s)")
 
-    st.dataframe(repairs.head())
+    # Create estimate workbook
+    estimator = EstimateGenerator()
 
-    st.stop()
+    output_file = os.path.join(
+        "output",
+        f"{village}_Estimate.xlsx"
+    )
 
-st.write("---")
+    estimator.save(output_file)
+
+    st.success("✅ Estimate workbook created successfully!")
+
+    st.write(f"Saved to: {output_file}")
