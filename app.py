@@ -1,25 +1,23 @@
 import streamlit as st
+import pandas as pd
+
+from modules.odk import ODKCentral
 
 st.set_page_config(
-    page_title="WHS Rejuvenation Estimator",
+    page_title="WHS Rejuvenation Estimation System",
     layout="wide"
 )
 
 st.title("🏗 WHS Rejuvenation Estimation System")
 
-st.markdown("---")
+if st.button("Connect to ODK"):
 
-st.header("Generate Estimate")
+    odk = ODKCentral()
 
-village = st.text_input("Enter Village Name")
+    with st.spinner("Downloading Basic Information..."):
 
-if st.button("Generate Estimate"):
+        basic = odk.get_basic_information()
 
-    st.info(f"Generating estimate for {village}...")
+    st.success(f"{len(basic)} records downloaded")
 
-    # Next step:
-    # 1. Read ODK
-    # 2. Process
-    # 3. Generate Workbook
-
-    st.success("Coming in next step...")
+    st.dataframe(basic.head())
