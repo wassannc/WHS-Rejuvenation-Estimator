@@ -40,6 +40,12 @@ class EstimateGenerator:
                 row["Cell"],
                 value
             )
+        # Fixed values
+        self.write_value(
+            "Input Data Sheet-G",
+            "C10",
+            "Rejuvenation of Water Harvesting Structure"
+        )
 
     def save(self, filename):
         os.makedirs("output", exist_ok=True)
