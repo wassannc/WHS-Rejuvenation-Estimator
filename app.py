@@ -110,7 +110,20 @@ st.info("Repairs: Not Loaded")
 st.divider()
 
 if st.button("📄 Generate Estimate", type="primary"):
-    st.success("Next step: Loading Repairs Form...")
+
+    with st.spinner("Loading repair assessments..."):
+
+        repairs = odk.get_repairs()
+
+    st.success(f"{len(repairs)} repair records downloaded")
+
+    st.subheader("Repairs Form Columns")
+
+    st.write(repairs.columns.tolist())
+
+    st.dataframe(repairs.head())
+
+    st.stop()
 
 st.write("---")
 
