@@ -28,29 +28,26 @@ class ODKCentral:
         self.auth = HTTPBasicAuth(USERNAME, PASSWORD)
 
     def get_form_data(self, form_id):
-        """
-        Download one form as CSV from ODK Central
-        """
 
-        url = (
-            f"{self.base_url}/v1/projects/"
-            f"{self.project_id}/forms/{form_id}.svc/Submissions.csv"
+    url = (
+        f"{self.base_url}/v1/projects/"
+        f"{self.project_id}/forms/{form_id}/submissions.csv"
+    )
+
+    response = requests.get(url, auth=self.auth)
+
+    if response.status_code != 200:
+        raise Exception(
+            f"ODK Error {response.status_code}\n"
+            f"{response.text}"
         )
 
-        response = requests.get(url, auth=self.auth)
+    from io import StringIO
 
-        if response.status_code != 200:
-            raise Exception(
-                f"Unable to download {form_id}\n"
-                f"Status Code: {response.status_code}"
-            )
-
-        from io import StringIO
-
+    try:
         return pd.read_csv(StringIO(response.text))
-
-    def get_basic_information(self):
-        return self.get_form_data(BASIC_FORM_ID)
-
-    def get_repairs(self):
-        return self.get_form_data(REPAIR_FORM_ID)
+    except Exception:
+        raise Exception(
+            "Unable to read CSV.\n\n"
+            + response.text[:500]
+        )
