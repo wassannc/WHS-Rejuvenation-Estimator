@@ -118,6 +118,8 @@ if st.button("📄 Generate Estimate", type="primary"):
         repairs = odk.get_repairs()
 
         lead = odk.get_lead()
+        st.error("STOP HERE - TEST")
+        st.stop()
 
     processor = RepairProcessor(repairs)
 
@@ -129,13 +131,6 @@ if st.button("📄 Generate Estimate", type="primary"):
     )
     
     try:
-        village_lead = processor.filter_lead(
-            lead,
-            district,
-            block,
-            gp,
-            village
-        )
 
         st.success(f"Found {len(village_lead)} lead record(s)")
 
