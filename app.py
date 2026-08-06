@@ -119,6 +119,8 @@ if st.button("📄 Generate Estimate", type="primary"):
 
         lead = odk.get_lead()
 
+        discharge = odk.get_discharge()
+
     processor = RepairProcessor(repairs)
 
     village_repairs = processor.filter_structure(
@@ -135,8 +137,17 @@ if st.button("📄 Generate Estimate", type="primary"):
         gp,
         village
     )
+    
+    village_discharge = processor.filter_discharge(
+        discharge,
+        district,
+        block,
+        gp,
+        village
+    )
 
     st.success(f"Found {len(village_lead)} lead record(s)")
+    st.success(f"Found {len(village_discharge)} discharge record(s)")
 
     st.success(f"Found {len(village_repairs)} repair record(s)")
     st.success(f"Lead Statement records: {len(lead)}")
