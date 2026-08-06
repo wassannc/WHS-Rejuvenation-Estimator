@@ -53,3 +53,6 @@ class ODKCentral:
 
     def get_repairs(self):
         return self.get_form_data(REPAIR_FORM_ID)
+
+    def get_lead(self):
+        return self.get_form_data(LEAD_FORM_ID)
