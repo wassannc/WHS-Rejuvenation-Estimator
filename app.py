@@ -111,10 +111,13 @@ with col2:
 
 if st.button("📄 Generate Estimate", type="primary"):
 
-    with st.spinner("Loading repair assessments..."):
+    with st.spinner("Loading ODK data..."):
 
         odk = ODKCentral()
+
         repairs = odk.get_repairs()
+
+        lead = odk.get_lead()
 
     processor = RepairProcessor(repairs)
 
