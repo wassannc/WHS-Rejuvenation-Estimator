@@ -70,6 +70,17 @@ class EstimateGenerator:
             "C11",
             outcome
         )
+         self.write_value(
+            "Input Data Sheet-T",
+            "C66",
+            "Kothavalasa"
+        )
+
+        self.write_value(
+            "Input Data Sheet-T",
+            "C70",
+            "Mamidipalli"
+        )
 
     def save(self, filename):
         os.makedirs("output", exist_ok=True)
