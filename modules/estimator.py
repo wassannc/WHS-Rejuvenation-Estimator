@@ -42,35 +42,34 @@ class EstimateGenerator:
             )
 
     def write_fixed_values(self, record):
+        # Kharif extent from ODK
+        extent = record.get("whs-extent_kharif", "")
 
-    # Kharif extent from ODK
-    extent = record.get("whs-extent_kharif", "")
+        # Format extent
+        try:
+            extent = round(float(extent), 2)
+        except Exception:
+            pass
 
-    # Format extent
-    try:
-        extent = round(float(extent), 2)
-    except Exception:
-        pass
+        # Name of Work
+        self.write_value(
+            "Input Data Sheet-G",
+            "C10",
+            "Rejuvenation of Water Harvesting Structure"
+        )
 
-    # Name of Work
-    self.write_value(
-        "Input Data Sheet-G",
-        "C10",
-        "Rejuvenation of Water Harvesting Structure"
-    )
+        # Expected Outcome
+        outcome = (
+            f"Assured irrigation to {extent} acres of land;\n"
+            f"Additional income of ₹25,000 to ₹40,000 per acre;\n"
+            f"Ecological development in the village through agro-ecological farming practices."
+        )
 
-    # Expected Outcome
-    outcome = (
-        f"Assured irrigation to {extent} acres of land;\n"
-        f"Additional income of ₹25,000 to ₹40,000 per acre;\n"
-        f"Ecological development in the village through agro-ecological farming practices."
-    )
-
-    self.write_value(
-        "Input Data Sheet-G",
-        "C11",
-        outcome
-    )
+        self.write_value(
+            "Input Data Sheet-G",
+            "C11",
+            outcome
+        )
 
     def save(self, filename):
         os.makedirs("output", exist_ok=True)
