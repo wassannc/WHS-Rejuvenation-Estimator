@@ -120,8 +120,6 @@ if st.button("📄 Generate Estimate", type="primary"):
         lead = odk.get_lead()
 
     processor = RepairProcessor(repairs)
-    st.write(dir(processor))
-    st.stop()
 
     village_repairs = processor.filter_structure(
         district,
@@ -130,14 +128,20 @@ if st.button("📄 Generate Estimate", type="primary"):
         village
     )
     
-    village_lead = processor.filter_lead(
-        lead,
-        district,
-        block,
-        gp,
-        village
-    )
-    st.success(f"Found {len(village_lead)} lead record(s)")
+    try:
+        village_lead = processor.filter_lead(
+            lead,
+            district,
+            block,
+            gp,
+            village
+        )
+
+        st.success(f"Found {len(village_lead)} lead record(s)")
+
+    except Exception as e:
+        st.exception(e)
+        st.stop()
 
     st.success(f"Found {len(village_repairs)} repair record(s)")
     st.success(f"Lead Statement records: {len(lead)}")
