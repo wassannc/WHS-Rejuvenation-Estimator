@@ -12,6 +12,7 @@ PROJECT_ID = 6
 BASIC_FORM_ID = "Basic_info"
 REPAIR_FORM_ID = "2.Rejuvenation_works"
 LEAD_FORM_ID = "6. Lead_statement"
+DISCHARGE_FORM_ID = "1.1 Discarge"
 
 
 # -------- FILES -----------------------
