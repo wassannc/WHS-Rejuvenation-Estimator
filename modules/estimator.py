@@ -35,6 +35,9 @@ class EstimateGenerator:
 
             value = record[odk_field]
 
+            if row["Cell"] == "C7":
+                print("Writing C7:", value)
+
             self.write_value(
                 row["Workbook Sheet"],
                 row["Cell"],
