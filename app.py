@@ -118,7 +118,8 @@ if st.button("📄 Generate Estimate", type="primary"):
         repairs = odk.get_repairs()
 
         lead = odk.get_lead()
-        st.error("STOP HERE - TEST")
+        st.write("Lead Statement Columns")
+        st.write(lead.columns.tolist())
         st.stop()
 
     processor = RepairProcessor(repairs)
