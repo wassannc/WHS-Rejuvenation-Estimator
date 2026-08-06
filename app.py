@@ -128,9 +128,15 @@ if st.button("📄 Generate Estimate", type="primary"):
         village
     )
     
-    try:
+    village_lead = processor.filter_lead(
+        lead,
+        district,
+        block,
+        gp,
+        village
+    )
 
-        st.success(f"Found {len(village_lead)} lead record(s)")
+    st.success(f"Found {len(village_lead)} lead record(s)")
 
     except Exception as e:
         st.exception(e)
