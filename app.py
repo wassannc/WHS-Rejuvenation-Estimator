@@ -3,6 +3,7 @@ import pandas as pd
 
 from modules.odk import ODKCentral
 from modules.estimator import EstimateGenerator
+from modules.processor import RepairProcessor
 import os
 
 st.set_page_config(
@@ -115,13 +116,14 @@ if st.button("📄 Generate Estimate", type="primary"):
         odk = ODKCentral()
         repairs = odk.get_repairs()
 
-    # Filter repair records for selected structure
-    village_repairs = repairs[
-        (repairs["basic_details_repairs-district"] == district) &
-        (repairs["basic_details_repairs-block"] == block) &
-        (repairs["basic_details_repairs-gp"] == gp) &
-        (repairs["basic_details_repairs-village"] == village)
-    ]
+    processor = RepairProcessor(repairs)
+
+    village_repairs = processor.filter_structure(
+        district,
+        block,
+        gp,
+        village
+    )
 
     st.success(f"Found {len(village_repairs)} repair record(s)")
 
