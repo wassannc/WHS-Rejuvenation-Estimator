@@ -15,6 +15,7 @@ from config import (
     BASIC_FORM_ID,
     REPAIR_FORM_ID,
     LEAD_FORM_ID,
+    DISCHARGE_FORM_ID,
 )
 
 
