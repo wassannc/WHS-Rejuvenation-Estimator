@@ -46,10 +46,10 @@ class EstimateGenerator:
     # Kharif extent from ODK
     extent = record.get("whs-extent_kharif", "")
 
-    # Clean the value
+    # Format extent
     try:
         extent = round(float(extent), 2)
-    except:
+    except Exception:
         pass
 
     # Name of Work
