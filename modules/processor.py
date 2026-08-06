@@ -44,3 +44,20 @@ class RepairProcessor:
         ]
 
         return df.reset_index(drop=True)
+    def filter_discharge(
+        self,
+        discharge_df,
+        district,
+        block,
+        gp,
+        village
+    ):
+
+        df = discharge_df[
+            (discharge_df["basic_info-district"] == district) &
+            (discharge_df["basic_info-block"] == block) &
+            (discharge_df["basic_info-gp"] == gp) &
+            (discharge_df["basic_info-village"] == village)
+        ]
+
+        return df.reset_index(drop=True)
