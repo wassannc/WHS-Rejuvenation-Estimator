@@ -70,7 +70,7 @@ class EstimateGenerator:
             "C11",
             outcome
         )
-         self.write_value(
+        self.write_value(
             "Input Data Sheet-T",
             "C66",
             "Kothavalasa"
