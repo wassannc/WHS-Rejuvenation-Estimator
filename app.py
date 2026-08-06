@@ -148,6 +148,8 @@ if st.button("📄 Generate Estimate", type="primary"):
         # Sheet-G
         # -------------------------
         record = structure.to_dict()
+        st.write("whs-local_name =", record.get("whs-local_name"))
+        st.stop()
 
         estimator.populate_sheet(
             "Input Data Sheet-G",
