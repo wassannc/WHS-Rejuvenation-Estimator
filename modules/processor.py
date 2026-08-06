@@ -37,10 +37,10 @@ class RepairProcessor:
     ):
 
         df = lead_df[
-            (lead_df["basic_details_lead-district"] == district) &
-            (lead_df["basic_details_lead-block"] == block) &
-            (lead_df["basic_details_lead-gp"] == gp) &
-            (lead_df["basic_details_lead-village"] == village)
+            (lead_df["lead_statement-district"] == district) &
+            (lead_df["lead_statement-block"] == block) &
+            (lead_df["lead_statement-gp"] == gp) &
+            (lead_df["lead_statement-village"] == village)
         ]
 
         return df.reset_index(drop=True)
