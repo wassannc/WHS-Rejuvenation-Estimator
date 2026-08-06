@@ -127,6 +127,15 @@ if st.button("📄 Generate Estimate", type="primary"):
         gp,
         village
     )
+    
+    village_lead = processor.filter_lead(
+        lead,
+        district,
+        block,
+        gp,
+        village
+    )
+    st.success(f"Found {len(village_lead)} lead record(s)")
 
     st.success(f"Found {len(village_repairs)} repair record(s)")
     st.success(f"Lead Statement records: {len(lead)}")
@@ -151,6 +160,9 @@ if st.button("📄 Generate Estimate", type="primary"):
         # -------------------------
         # Sheet-T
         # -------------------------
+        # -------------------------
+        # Repairs
+        # -------------------------
         if len(village_repairs) > 0:
 
             repair_record = village_repairs.iloc[0].to_dict()
@@ -160,11 +172,29 @@ if st.button("📄 Generate Estimate", type="primary"):
                 repair_record
             )
 
-            st.success("✅ Input Data Sheet-T populated")
+            st.success("✅ Repair data populated")
 
         else:
 
-            st.warning("No repair records found for this structure.")
+            st.warning("No repair records found.")
+
+        # -------------------------
+        # Lead Statement
+        # -------------------------
+        if len(village_lead) > 0:
+
+            lead_record = village_lead.iloc[0].to_dict()
+
+            estimator.populate_sheet(
+                "Input Data Sheet-T",
+                lead_record
+            )
+
+            st.success("✅ Lead Statement populated")
+
+        else:
+
+            st.warning("No Lead Statement found.")
 
     except Exception as e:
         st.error(f"Populate Error: {e}")
