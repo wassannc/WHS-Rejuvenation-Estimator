@@ -59,6 +59,6 @@ class ODKCentral:
     def get_lead(self):
         return self.get_form_data(LEAD_FORM_ID)
 
-    def get_lead(self):
+    def get_discharge(self):
         return self.get_form_data(DISCHARGE_FORM_ID)
 
