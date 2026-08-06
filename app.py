@@ -127,39 +127,40 @@ if st.button("📄 Generate Estimate", type="primary"):
 
     st.success(f"Found {len(village_repairs)} repair record(s)")
 
-    # Create estimate workbook
-    estimator = EstimateGenerator()
-    # -------------------------
-    # Sheet-G
-    # -------------------------
-    record = structure.to_dict()
-
-    estimator.populate_sheet(
-        "Input Data Sheet-G",
-        record
-    )
-
-    estimator.write_fixed_values(record)
-
-    st.success("✅ Input Data Sheet-G populated")
-
-    # -------------------------
-    # Sheet-T
-    # -------------------------
-    if len(village_repairs) > 0:
-
-        repair_record = village_repairs.iloc[0].to_dict()
+    try:
+        # Create estimate workbook
+        estimator = EstimateGenerator()
+        # -------------------------
+        # Sheet-G
+        # -------------------------
+        record = structure.to_dict()
 
         estimator.populate_sheet(
-            "Input Data Sheet-T",
-            repair_record
+            "Input Data Sheet-G",
+            record
         )
 
-        st.success("✅ Input Data Sheet-T populated")
+        estimator.write_fixed_values(record)
 
-    else:
+        st.success("✅ Input Data Sheet-G populated")
 
-        st.warning("No repair records found for this structure.")
+        # -------------------------
+        # Sheet-T
+        # -------------------------
+        if len(village_repairs) > 0:
+
+            repair_record = village_repairs.iloc[0].to_dict()
+
+            estimator.populate_sheet(
+                "Input Data Sheet-T",
+                repair_record
+            )
+
+            st.success("✅ Input Data Sheet-T populated")
+
+        else:
+
+            st.warning("No repair records found for this structure.")
 
     except Exception as e:
         st.error(f"Populate Error: {e}")
