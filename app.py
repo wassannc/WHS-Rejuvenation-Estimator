@@ -120,6 +120,8 @@ if st.button("📄 Generate Estimate", type="primary"):
         lead = odk.get_lead()
 
     processor = RepairProcessor(repairs)
+    st.write(dir(processor))
+    st.stop()
 
     village_repairs = processor.filter_structure(
         district,
