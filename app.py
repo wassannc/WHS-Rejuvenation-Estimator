@@ -207,6 +207,23 @@ if st.button("📄 Generate Estimate", type="primary"):
         else:
 
             st.warning("No Lead Statement found.")
+        # -------------------------
+        # Discharge
+        # -------------------------
+        if len(village_discharge) > 0:
+
+            discharge_record = village_discharge.iloc[0].to_dict()
+
+            estimator.populate_sheet(
+                "Input Data Sheet-T",
+                discharge_record
+             )
+
+            st.success("✅ Discharge data populated")
+
+        else:
+
+            st.warning("No Discharge record found.")
 
     except Exception as e:
         st.error(f"Populate Error: {e}")
