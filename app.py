@@ -148,9 +148,7 @@ if st.button("📄 Generate Estimate", type="primary"):
 
     st.success(f"Found {len(village_lead)} lead record(s)")
     st.success(f"Found {len(village_discharge)} discharge record(s)")
-
     st.success(f"Found {len(village_repairs)} repair record(s)")
-    st.success(f"Lead Statement records: {len(lead)}")
 
     try:
         # Create estimate workbook
