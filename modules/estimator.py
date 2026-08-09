@@ -86,5 +86,12 @@ class EstimateGenerator:
         )
 
     def save(self, filename):
+
         os.makedirs("output", exist_ok=True)
+
+        # Recalculate Excel formulas when the workbook is opened
+        self.workbook.calculation.fullCalcOnLoad = True
+        self.workbook.calculation.forceFullCalc = True
+        self.workbook.calculation.calcMode = "auto"
+
         self.workbook.save(filename)
