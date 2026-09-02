@@ -22,6 +22,12 @@ def load_basic_data():
     return odk.get_basic_information()
     
 basic = load_basic_data()
+from modules.mapper import FieldMapper
+
+mapper_test = FieldMapper()
+
+st.write("### 🔎 Repeat Mapping Test")
+st.dataframe(mapper_test.get_repeat_mapping())
 
 st.success(f"{len(basic)} structures loaded")
 
