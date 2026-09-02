@@ -122,27 +122,13 @@ if st.button("📄 Generate Estimate", type="primary"):
         odk = ODKCentral()
 
         repairs = odk.get_repairs()
-        st.write("### 🔎 Repeat Columns Found")
+        st.write("### 🔎 ODK ZIP Export Test")
 
-        repeat_columns = [
-            col for col in repairs.columns
-            if any(x in str(col).lower() for x in [
-                "ncg",
-                "guidewall_height",
-                "gwr",
-                "leak",
-                "ltcb",
-                "gwbjl",
-                "nboe"
-            ])
-        ]
+        export_files = odk.get_form_export_files(REPAIR_FORM_ID)
         
-        st.write("Found", len(repeat_columns), "matching columns")
+        st.write("Files returned by ODK Central:")
+        st.write(export_files)
         
-        st.dataframe(
-            pd.DataFrame({"ODK Column": repeat_columns}),
-            use_container_width=True
-        )
         lead = odk.get_lead()
 
         discharge = odk.get_discharge()
