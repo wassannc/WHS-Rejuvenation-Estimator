@@ -10,7 +10,11 @@ from config import MAPPING_FILE
 class FieldMapper:
 
     def __init__(self):
-        self.mapping = pd.read_excel(MAPPING_FILE)
+        self.mapping = pd.read_excel(MAPPING_FILE, sheet_name="Sheet1")
+        self.repeat_mapping = pd.read_excel(
+            MAPPING_FILE,
+            sheet_name="Repeat Mapping"
+        )
 
         # remove completely blank rows
         self.mapping = self.mapping.dropna(how="all")
@@ -47,3 +51,8 @@ class FieldMapper:
         return self.mapping[
             self.mapping["Data Source"] == "GIS"
         ]
+    def get_repeat_mapping(self):
+        """
+        Returns repeat mapping rows from the Repeat Mapping sheet.
+        """
+        return self.mapping
