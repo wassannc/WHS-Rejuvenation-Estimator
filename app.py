@@ -122,40 +122,25 @@ if st.button("📄 Generate Estimate", type="primary"):
         odk = ODKCentral()
 
         repairs = odk.get_repairs()
-        st.write("### 🔎 Repeat Fields Test")
+        st.write("### 🔎 Repeat Columns Found")
 
-        repeat_fields = [
-            "ncg_-chainage_ncg_from",
-            "ncg_-chainage_ncg_to",
-            "guidewalls_side",
-            "length_ncg",
-        
-            "Canal_guidewall_height_increase_-chainage_canal_guidewall_height_increase_from",
-            "Canal_guidewall_height_increase_-chainage_canal_guidewall_height_increase_to",
-            "length_canal_guidewall_height_increase",
-        
-            "gwr_-gwr_side",
-            "gwr_-chainage_gwr_from",
-            "gwr_-chainage_gwr_to",
-            "avg_length_gwr",
-        
-            "stop_leak_bodywall_repeat_-chainage_leak_la_sl_from",
-            "stop_leak_bodywall_repeat_-chainage_leak_la_sl_to",
-            "stop_leak_bodywall_repeat_-avg_length_la_leak1_sl",
-        
-            "nboe_-canal_side",
-            "nboe_-chainage_from_nboe",
-            "nboe_-chainage_to_nboe",
-            "nboe_-length_nboe",
+        repeat_columns = [
+            col for col in repairs.columns
+            if any(x in str(col).lower() for x in [
+                "ncg",
+                "guidewall_height",
+                "gwr",
+                "leak",
+                "ltcb",
+                "gwbjl",
+                "nboe"
+            ])
         ]
         
-        available_fields = [
-            field for field in repeat_fields
-            if field in repairs.columns
-        ]
+        st.write("Found", len(repeat_columns), "matching columns")
         
         st.dataframe(
-            repairs[available_fields],
+            pd.DataFrame({"ODK Column": repeat_columns}),
             use_container_width=True
         )
         lead = odk.get_lead()
