@@ -55,14 +55,13 @@ class ODKCentral:
         """
         Download the complete ODK CSV ZIP export.
 
-        For each CSV file in the ZIP, return:
-        - filename
-        - number of rows
-        - column names
+        Diagnostic version:
+        - Shows each CSV filename and row count.
+        - For the root CSV, shows key-related fields.
+        - For repeat CSVs, shows PARENT_KEY and KEY values.
 
-        This is a diagnostic step to identify the repeat-table
-        structure and the fields needed to connect repeat records
-        with the main repair submission.
+        This is used to confirm how repeat records connect
+        to the main repair submission.
         """
 
         url = (
@@ -84,20 +83,41 @@ class ODKCentral:
 
             for filename in z.namelist():
 
-                # Ignore media files and directories.
                 if not filename.lower().endswith(".csv"):
                     continue
 
                 with z.open(filename) as file:
                     df = pd.read_csv(file)
 
-                export_details.append(
-                    {
-                        "filename": filename,
-                        "rows": len(df),
-                        "columns": list(df.columns),
-                    }
-                )
+                details = {
+                    "filename": filename,
+                    "rows": len(df),
+                }
+
+                # Show only columns useful for identifying
+                # the connection between root and repeat records.
+                key_columns = [
+                    col for col in df.columns
+                    if (
+                        "KEY" in str(col).upper()
+                        or "INSTANCE" in str(col).upper()
+                    )
+                ]
+
+                details["key_columns"] = key_columns
+
+                if key_columns and len(df) > 0:
+                    details["key_samples"] = (
+                        df[key_columns]
+                        .head(5)
+                        .fillna("")
+                        .astype(str)
+                        .to_dict("records")
+                    )
+                else:
+                    details["key_samples"] = []
+
+                export_details.append(details)
 
         return export_details
 
