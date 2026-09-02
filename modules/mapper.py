@@ -56,3 +56,8 @@ class FieldMapper:
         Returns repeat mapping rows from the Repeat Mapping sheet.
         """
         return self.mapping
+
+    if __name__ == "__main__":
+        mapper = FieldMapper()
+        print("\nREPEAT MAPPING:")
+        print(mapper.get_repeat_mapping().to_string(index=False))
