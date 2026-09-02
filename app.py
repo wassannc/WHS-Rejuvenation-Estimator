@@ -122,11 +122,42 @@ if st.button("📄 Generate Estimate", type="primary"):
         odk = ODKCentral()
 
         repairs = odk.get_repairs()
-        st.write("### 🔎 ODK Repair Data Test")
-        st.write("Repair rows:", len(repairs))
-        st.write("Repair columns:")
-        st.write(list(repairs.columns))
+        st.write("### 🔎 Repeat Fields Test")
 
+        repeat_fields = [
+            "ncg_-chainage_ncg_from",
+            "ncg_-chainage_ncg_to",
+            "guidewalls_side",
+            "length_ncg",
+        
+            "Canal_guidewall_height_increase_-chainage_canal_guidewall_height_increase_from",
+            "Canal_guidewall_height_increase_-chainage_canal_guidewall_height_increase_to",
+            "length_canal_guidewall_height_increase",
+        
+            "gwr_-gwr_side",
+            "gwr_-chainage_gwr_from",
+            "gwr_-chainage_gwr_to",
+            "avg_length_gwr",
+        
+            "stop_leak_bodywall_repeat_-chainage_leak_la_sl_from",
+            "stop_leak_bodywall_repeat_-chainage_leak_la_sl_to",
+            "stop_leak_bodywall_repeat_-avg_length_la_leak1_sl",
+        
+            "nboe_-canal_side",
+            "nboe_-chainage_from_nboe",
+            "nboe_-chainage_to_nboe",
+            "nboe_-length_nboe",
+        ]
+        
+        available_fields = [
+            field for field in repeat_fields
+            if field in repairs.columns
+        ]
+        
+        st.dataframe(
+            repairs[available_fields],
+            use_container_width=True
+        )
         lead = odk.get_lead()
 
         discharge = odk.get_discharge()
