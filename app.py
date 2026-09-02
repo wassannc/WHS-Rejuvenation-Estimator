@@ -122,6 +122,10 @@ if st.button("📄 Generate Estimate", type="primary"):
         odk = ODKCentral()
 
         repairs = odk.get_repairs()
+        st.write("### 🔎 ODK Repair Data Test")
+        st.write("Repair rows:", len(repairs))
+        st.write("Repair columns:")
+        st.write(list(repairs.columns))
 
         lead = odk.get_lead()
 
