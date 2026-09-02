@@ -53,8 +53,16 @@ class ODKCentral:
 
     def get_form_export_files(self, form_id):
         """
-        Download the complete ODK CSV ZIP export
-        and return the names of the files inside it.
+        Download the complete ODK CSV ZIP export.
+
+        For each CSV file in the ZIP, return:
+        - filename
+        - number of rows
+        - column names
+
+        This is a diagnostic step to identify the repeat-table
+        structure and the fields needed to connect repeat records
+        with the main repair submission.
         """
 
         url = (
@@ -70,8 +78,28 @@ class ODKCentral:
                 f"{response.text}"
             )
 
+        export_details = []
+
         with ZipFile(BytesIO(response.content)) as z:
-            return z.namelist()
+
+            for filename in z.namelist():
+
+                # Ignore media files and directories.
+                if not filename.lower().endswith(".csv"):
+                    continue
+
+                with z.open(filename) as file:
+                    df = pd.read_csv(file)
+
+                export_details.append(
+                    {
+                        "filename": filename,
+                        "rows": len(df),
+                        "columns": list(df.columns),
+                    }
+                )
+
+        return export_details
 
     def get_basic_information(self):
         return self.get_form_data(BASIC_FORM_ID)
