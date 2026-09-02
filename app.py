@@ -4,6 +4,7 @@ import pandas as pd
 from modules.odk import ODKCentral
 from modules.estimator import EstimateGenerator
 from modules.processor import RepairProcessor
+from config import REPAIR_FORM_ID
 import os
 
 st.set_page_config(
