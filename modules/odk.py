@@ -1,45 +1,85 @@
-# ODK repeat retrieval helper
-# This version joins repeat CSV records to the selected parent repair
-# using root KEY == repeat PARENT_KEY.
+"""
+ODK Central Data Module
+"""
 
+import requests
 import pandas as pd
-from io import BytesIO
+from io import StringIO, BytesIO
 from zipfile import ZipFile
+from requests.auth import HTTPBasicAuth
+
+from config import (
+    ODK_URL,
+    USERNAME,
+    PASSWORD,
+    PROJECT_ID,
+    BASIC_FORM_ID,
+    REPAIR_FORM_ID,
+    LEAD_FORM_ID,
+    DISCHARGE_FORM_ID,
+)
 
 
-def get_repeat_records_from_export(zip_bytes, parent_key):
-    """
-    Read repeat records from an ODK Central ZIP export.
+class ODKCentral:
 
-    Parameters
-    ----------
-    zip_bytes : bytes
-        ZIP file returned by ODK Central.
-    parent_key : str
-        Root repair KEY / meta-instanceID.
+    def __init__(self):
+        self.base_url = ODK_URL
+        self.project_id = PROJECT_ID
+        self.auth = HTTPBasicAuth(USERNAME, PASSWORD)
 
-    Returns
-    -------
-    dict
-        {csv_filename: DataFrame} containing only rows belonging
-        to the selected repair.
-    """
-    results = {}
+    def get_form_data(self, form_id):
 
-    with ZipFile(BytesIO(zip_bytes)) as z:
-        for filename in z.namelist():
-            if not filename.lower().endswith(".csv"):
-                continue
+        url = (
+            f"{self.base_url}/v1/projects/"
+            f"{self.project_id}/forms/{form_id}/submissions.csv"
+        )
 
-            with z.open(filename) as f:
-                df = pd.read_csv(f, dtype=str)
+        response = requests.get(url, auth=self.auth)
 
-            if "PARENT_KEY" not in df.columns:
-                continue
+        if response.status_code != 200:
+            raise Exception(
+                f"ODK Error {response.status_code}\n"
+                f"{response.text}"
+            )
 
-            matched = df[df["PARENT_KEY"].astype(str).str.strip() ==
-                         str(parent_key).strip()].copy()
+        try:
+            return pd.read_csv(StringIO(response.text))
+        except Exception:
+            raise Exception(
+                "Unable to read CSV\n\n"
+                + response.text[:500]
+            )
 
-            results[filename] = matched.reset_index(drop=True)
+    def get_form_export_files(self, form_id):
+        """
+        Download the complete ODK CSV ZIP export
+        and return the names of the CSV files inside it.
+        """
 
-    return results
+        url = (
+            f"{self.base_url}/v1/projects/"
+            f"{self.project_id}/forms/{form_id}/submissions.csv.zip"
+        )
+
+        response = requests.get(url, auth=self.auth)
+
+        if response.status_code != 200:
+            raise Exception(
+                f"ODK ZIP Export Error {response.status_code}\n"
+                f"{response.text}"
+            )
+
+        with ZipFile(BytesIO(response.content)) as z:
+            return z.namelist()
+
+    def get_basic_information(self):
+        return self.get_form_data(BASIC_FORM_ID)
+
+    def get_repairs(self):
+        return self.get_form_data(REPAIR_FORM_ID)
+
+    def get_lead(self):
+        return self.get_form_data(LEAD_FORM_ID)
+
+    def get_discharge(self):
+        return self.get_form_data(DISCHARGE_FORM_ID)
