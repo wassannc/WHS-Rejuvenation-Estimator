@@ -4,7 +4,8 @@ ODK Central Data Module
 
 import requests
 import pandas as pd
-from io import StringIO
+from io import StringIO, BytesIO
+from zipfile import ZipFile
 from requests.auth import HTTPBasicAuth
 
 from config import (
@@ -49,6 +50,27 @@ class ODKCentral:
                 "Unable to read CSV\n\n"
                 + response.text[:500]
             )
+        def get_form_export_files(self, form_id):
+            """
+            Download the complete ODK CSV ZIP export
+            and return the names of the CSV files inside it.
+            """
+    
+            url = (
+                f"{self.base_url}/v1/projects/"
+                f"{self.project_id}/forms/{form_id}/submissions.csv.zip"
+            )
+    
+            response = requests.get(url, auth=self.auth)
+    
+            if response.status_code != 200:
+                raise Exception(
+                    f"ODK ZIP Export Error {response.status_code}\n"
+                    f"{response.text}"
+                )
+    
+            with ZipFile(BytesIO(response.content)) as z:
+                return z.namelist()
 
     def get_basic_information(self):
         return self.get_form_data(BASIC_FORM_ID)
