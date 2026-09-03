@@ -10,7 +10,7 @@ st.set_page_config(
     page_title="WHS Rejuvenation Estimation System",
     layout="wide"
 )
-
+basic = load_basic_data()
 st.title("WHS Rejuvenation Estimation")
 
 # ---------------------------------------
