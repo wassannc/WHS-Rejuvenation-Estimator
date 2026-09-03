@@ -168,11 +168,11 @@ class EstimateGenerator:
             )
 
             sheet.cell(output_row, 6).value = record.get(
-                "ncg_-chainage_ncg_from", ""
+                "chainage_ncg_from", ""
             )
 
             sheet.cell(output_row, 7).value = record.get(
-                "ncg_-chainage_ncg_to", ""
+                "chainage_ncg_to", ""
             )
 
             # NCG length can be stored as side-specific fields
