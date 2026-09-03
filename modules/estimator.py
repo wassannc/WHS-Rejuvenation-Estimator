@@ -141,48 +141,98 @@ class EstimateGenerator:
     
     def populate_ncg_repeat(self, repeat_records, start_row=2):
         """
-        Write NCG repeat records into Repeat Details.
+        Write NCG repeat records into Repeat Details
+        and populate NCG totals/chainages in Input Data Sheet-T.
         """
-
+    
         sheet = self.workbook["Repeat Details"]
-
+        target_sheet = self.workbook["Input Data Sheet-T"]
+    
         ncg_filename = "2.Rejuvenation_works-ncg_.csv"
-
+    
         if ncg_filename not in repeat_records:
             return start_row
-
+    
         ncg_df = repeat_records[ncg_filename]
-
+    
         output_row = start_row
-
+    
+        left_lengths = []
+        right_lengths = []
+    
+        left_from = []
+        left_to = []
+    
+        right_from = []
+        right_to = []
+    
         for record_no, (_, record) in enumerate(
             ncg_df.iterrows(), start=1
         ):
-
+    
+            side = str(record.get("guidewalls_side", "")).strip().lower()
+    
+            chainage_from = record.get("chainage_ncg_from", "")
+            chainage_to = record.get("chainage_ncg_to", "")
+    
             sheet.cell(output_row, 2).value = "NCG"
             sheet.cell(output_row, 3).value = "New Canal Guidewall"
             sheet.cell(output_row, 4).value = record_no
-
-            sheet.cell(output_row, 5).value = record.get(
-                "guidewalls_side", ""
-            )
-
-            sheet.cell(output_row, 6).value = record.get(
-                "chainage_ncg_from", ""
-            )
-
-            sheet.cell(output_row, 7).value = record.get(
-                "chainage_ncg_to", ""
-            )
-
+            sheet.cell(output_row, 5).value = side
+            sheet.cell(output_row, 6).value = chainage_from
+            sheet.cell(output_row, 7).value = chainage_to
+    
             # Length = Chainage To - Chainage From
             sheet.cell(output_row, 8).value = (
                 f'=IF(AND(F{output_row}<>"",G{output_row}<>""),'
                 f'G{output_row}-F{output_row},"")'
             )
-
+    
+            # Collect values for Sheet-T
+            try:
+                cf = float(chainage_from)
+                ct = float(chainage_to)
+                length = ct - cf
+    
+                if side == "left":
+                    left_lengths.append(length)
+                    left_from.append(str(chainage_from))
+                    left_to.append(str(chainage_to))
+    
+                elif side == "right":
+                    right_lengths.append(length)
+                    right_from.append(str(chainage_from))
+                    right_to.append(str(chainage_to))
+    
+            except (ValueError, TypeError):
+                pass
+    
             output_row += 1
-
+    
+        # -------------------------------------------------
+        # Populate Input Data Sheet-T
+        # -------------------------------------------------
+    
+        # LEFT NCG -> Row 19
+        if left_lengths:
+            target_sheet["E19"] = sum(left_lengths)
+            target_sheet["C19"] = "; ".join(left_from)
+            target_sheet["D19"] = "; ".join(left_to)
+        else:
+            target_sheet["E19"] = 0
+            target_sheet["C19"] = ""
+            target_sheet["D19"] = ""
+    
+        # RIGHT NCG -> Row 20
+        if right_lengths:
+            target_sheet["E20"] = sum(right_lengths)
+            target_sheet["C20"] = "; ".join(right_from)
+            target_sheet["D20"] = "; ".join(right_to)
+        else:
+            target_sheet["E20"] = 0
+            target_sheet["C20"] = ""
+            target_sheet["D20"] = ""
+    
         return output_row
     def setup_gwr_formulas(self):
         """
