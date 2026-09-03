@@ -250,14 +250,33 @@ class EstimateGenerator:
         # GWR Right = row 40
         # GWR Left  = row 41
         # -------------------------------------------------
-
-        target_sheet["C40"] = "='Repeat Details'!J500"
-        target_sheet["D40"] = "='Repeat Details'!K500"
-        target_sheet["E40"] = "='Repeat Details'!L500"
-
-        target_sheet["C41"] = "='Repeat Details'!M500"
-        target_sheet["D41"] = "='Repeat Details'!N500"
-        target_sheet["E41"] = "='Repeat Details'!O500"
+        target_sheet["C40"] = (
+            '=IFERROR(LOOKUP(2,1/(\'Repeat Details\'!$J$2:$J$500<>""),'
+            '\'Repeat Details\'!$J$2:$J$500),"")'
+        )
+        
+        target_sheet["D40"] = (
+            '=IFERROR(LOOKUP(2,1/(\'Repeat Details\'!$K$2:$K$500<>""),'
+            '\'Repeat Details\'!$K$2:$K$500),"")'
+        )
+        
+        target_sheet["E40"] = (
+            '=SUM(\'Repeat Details\'!$L$2:$L$500)'
+        )
+        
+        target_sheet["C41"] = (
+            '=IFERROR(LOOKUP(2,1/(\'Repeat Details\'!$M$2:$M$500<>""),'
+            '\'Repeat Details\'!$M$2:$M$500),"")'
+        )
+        
+        target_sheet["D41"] = (
+            '=IFERROR(LOOKUP(2,1/(\'Repeat Details\'!$N$2:$N$500<>""),'
+            '\'Repeat Details\'!$N$2:$N$500),"")'
+        )
+        
+        target_sheet["E41"] = (
+            '=SUM(\'Repeat Details\'!$O$2:$O$500)'
+        )
 
         # -------------------------------------------------
         # Hide helper columns
