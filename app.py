@@ -188,7 +188,33 @@ if st.button("📄 Generate Estimate", type="primary"):
         if len(village_repairs) > 0:
 
             repair_record = village_repairs.iloc[0].to_dict()
-
+        
+            # -----------------------------------------
+            # TEST REPEAT RECORDS
+            # -----------------------------------------
+            parent_key = repair_record.get("KEY", "")
+        
+            st.write("### 🔗 Repeat Record Test")
+            st.write("Selected Repair KEY:", parent_key)
+        
+            if parent_key:
+                repeat_records = odk.get_repeat_records(
+                    REPAIR_FORM_ID,
+                    parent_key
+                )
+        
+                st.write("Repeat records found:")
+        
+                for filename, repeat_df in repeat_records.items():
+                    st.write(
+                        f"**{filename}** → {len(repeat_df)} record(s)"
+                    )
+            else:
+                st.warning("Selected repair has no KEY.")
+        
+            # -----------------------------------------
+            # Existing repair population
+            # -----------------------------------------
             estimator.populate_sheet(
                 "Input Data Sheet-T",
                 repair_record
