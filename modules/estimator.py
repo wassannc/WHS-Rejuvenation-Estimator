@@ -117,17 +117,17 @@ class EstimateGenerator:
 
             # Side
             sheet.cell(output_row, 5).value = record.get(
-                "gwr_-gwr_side", ""
+                "gwr_side", ""
             )
 
             # Chainage From
             sheet.cell(output_row, 6).value = record.get(
-                "gwr_-chainage_gwr_from", ""
+                "chainage_gwr_from", ""
             )
 
             # Chainage To
             sheet.cell(output_row, 7).value = record.get(
-                "gwr_-chainage_gwr_to", ""
+                "chainage_gwr_to", ""
             )
 
             # Length
