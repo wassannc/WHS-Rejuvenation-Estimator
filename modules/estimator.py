@@ -175,21 +175,11 @@ class EstimateGenerator:
                 "chainage_ncg_to", ""
             )
 
-            # NCG length can be stored as side-specific fields
-            length = ""
-
-            side = str(
-                record.get("guidewalls_side", "")
-            ).strip().lower()
-
-            if side == "right":
-                length = record.get("length_ncg_right", "")
-            elif side == "left":
-                length = record.get("length_ncg_left", "")
-            else:
-                length = record.get("length_ncg", "")
-
-            sheet.cell(output_row, 8).value = length
+            # Length = Chainage To - Chainage From
+            sheet.cell(output_row, 8).value = (
+                f'=IF(AND(F{output_row}<>"",G{output_row}<>""),'
+                f'G{output_row}-F{output_row},"")'
+            )
 
             output_row += 1
 
