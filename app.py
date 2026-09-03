@@ -227,7 +227,7 @@ if st.button("📄 Generate Estimate", type="primary"):
                     st.write(
                         f"**{filename}** → {len(repeat_df)} record(s)"
                     )
-                    if "NCG" in filename:
+                    if "ncg" in filename:
                         st.write("NCG columns:")
                         st.write(list(repeat_df.columns))
                         st.write("NCG records:")
