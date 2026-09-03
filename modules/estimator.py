@@ -234,9 +234,6 @@ class EstimateGenerator:
             target_sheet["D20"] = ""
     
         return output_row
-            output_row += 1
-
-    return output_row
 
     def populate_cghi_repeat(self, repeat_records, start_row=2):
         """
