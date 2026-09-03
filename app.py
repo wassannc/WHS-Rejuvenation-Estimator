@@ -215,6 +215,7 @@ if st.button("📄 Generate Estimate", type="primary"):
 
                 # Write GWR repeat records to Repeat Details
                 estimator.populate_gwr_repeat(repeat_records)
+                estimator.setup_gwr_formulas()
         
                 st.write("Repeat records found:")
         
