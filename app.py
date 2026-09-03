@@ -227,6 +227,11 @@ if st.button("📄 Generate Estimate", type="primary"):
                     st.write(
                         f"**{filename}** → {len(repeat_df)} record(s)"
                     )
+                    if "NCG" in filename:
+                        st.write("NCG columns:")
+                        st.write(list(repeat_df.columns))
+                        st.write("NCG records:")
+                        st.dataframe(repeat_df)
             else:
                 st.warning("Selected repair has no KEY.")
         
