@@ -245,34 +245,19 @@ class EstimateGenerator:
                     f'O{row-1}+$H{row},'
                     f'O{row-1})'
                 )
-        # -------------------------------------------------
+        # -------------------------------------------------        
         # Sheet-T
         # GWR Right = row 40
         # GWR Left  = row 41
         # -------------------------------------------------
-        target_sheet["C40"] = (
-            '=TEXTJOIN(", ",TRUE,\'Repeat Details\'!$J$2:$J$500)'
-        )
-        
-        target_sheet["D40"] = (
-            '=TEXTJOIN(", ",TRUE,\'Repeat Details\'!$K$2:$K$500)'
-        )
-        
-        target_sheet["E40"] = (
-            '=SUMPRODUCT(IFERROR(VALUE(\'Repeat Details\'!$L$2:$L$500),0))'
-        )
-        
-        target_sheet["C41"] = (
-            '=TEXTJOIN(", ",TRUE,\'Repeat Details\'!$M$2:$M$500)'
-        )
-        
-        target_sheet["D41"] = (
-            '=TEXTJOIN(", ",TRUE,\'Repeat Details\'!$N$2:$N$500)'
-        )
-        
-        target_sheet["E41"] = (
-            '=SUMPRODUCT(IFERROR(VALUE(\'Repeat Details\'!$O$2:$O$500),0))'
-        )
+
+        target_sheet["C40"] = "='Repeat Details'!J500"
+        target_sheet["D40"] = "='Repeat Details'!K500"
+        target_sheet["E40"] = "='Repeat Details'!L500"
+
+        target_sheet["C41"] = "='Repeat Details'!M500"
+        target_sheet["D41"] = "='Repeat Details'!N500"
+        target_sheet["E41"] = "='Repeat Details'!O500"
 
         # -------------------------------------------------
         # Hide helper columns
