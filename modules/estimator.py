@@ -136,99 +136,99 @@ class EstimateGenerator:
             )
 
             output_row += 1
-        def setup_gwr_formulas(self):
-            """
-            Create Excel formulas that consolidate GWR records
-            from Repeat Details into Input Data Sheet-T.
-    
-            Designed for Excel 2019+.
-            """
-    
-            repeat_sheet = self.workbook["Repeat Details"]
-            target_sheet = self.workbook["Input Data Sheet-T"]
-    
-            # -------------------------------------------------
-            # Hidden helper columns
-            # J = Right From
-            # K = Right To
-            # L = Right Length
-            # M = Left From
-            # N = Left To
-            # O = Left Length
-            # -------------------------------------------------
-    
-            for row in range(2, 501):
-    
-                repeat_sheet.cell(row, 10).value = (
-                    f'=IF(AND($B{row}="GWR",'
-                    f'LOWER($E{row})="right"),$F{row},"")'
-                )
-    
-                repeat_sheet.cell(row, 11).value = (
-                    f'=IF(AND($B{row}="GWR",'
-                    f'LOWER($E{row})="right"),$G{row},"")'
-                )
-    
-                repeat_sheet.cell(row, 12).value = (
-                    f'=IF(AND($B{row}="GWR",'
-                    f'LOWER($E{row})="right"),$H{row},"")'
-                )
-    
-                repeat_sheet.cell(row, 13).value = (
-                    f'=IF(AND($B{row}="GWR",'
-                    f'LOWER($E{row})="left"),$F{row},"")'
-                )
-    
-                repeat_sheet.cell(row, 14).value = (
-                    f'=IF(AND($B{row}="GWR",'
-                    f'LOWER($E{row})="left"),$G{row},"")'
-                )
-    
-                repeat_sheet.cell(row, 15).value = (
-                    f'=IF(AND($B{row}="GWR",'
-                    f'LOWER($E{row})="left"),$H{row},"")'
-                )
-    
-            # -------------------------------------------------
-            # Sheet-T formulas
-            # GWR Right = row 40
-            # GWR Left  = row 41
-            # -------------------------------------------------
-    
-            target_sheet["C40"] = (
-                '=TEXTJOIN("; ",TRUE,'
-                "'Repeat Details'!$J$2:$J$500)"
+    def setup_gwr_formulas(self):
+        """
+        Create Excel formulas that consolidate GWR records
+        from Repeat Details into Input Data Sheet-T.
+
+        Designed for Excel 2019+.
+        """
+
+        repeat_sheet = self.workbook["Repeat Details"]
+        target_sheet = self.workbook["Input Data Sheet-T"]
+
+        # -------------------------------------------------
+        # Hidden helper columns
+        # J = Right From
+        # K = Right To
+        # L = Right Length
+        # M = Left From
+        # N = Left To
+        # O = Left Length
+        # -------------------------------------------------
+
+        for row in range(2, 501):
+
+            repeat_sheet.cell(row, 10).value = (
+                f'=IF(AND($B{row}="GWR",'
+                f'LOWER($E{row})="right"),$F{row},"")'
             )
-    
-            target_sheet["D40"] = (
-                '=TEXTJOIN("; ",TRUE,'
-                "'Repeat Details'!$K$2:$K$500)"
+
+            repeat_sheet.cell(row, 11).value = (
+                f'=IF(AND($B{row}="GWR",'
+                f'LOWER($E{row})="right"),$G{row},"")'
             )
-    
-            target_sheet["E40"] = (
-                '=SUM(\'Repeat Details\'!$L$2:$L$500)'
+
+            repeat_sheet.cell(row, 12).value = (
+                f'=IF(AND($B{row}="GWR",'
+                f'LOWER($E{row})="right"),$H{row},"")'
             )
-    
-            target_sheet["C41"] = (
-                '=TEXTJOIN("; ",TRUE,'
-                "'Repeat Details'!$M$2:$M$500)"
+
+            repeat_sheet.cell(row, 13).value = (
+                f'=IF(AND($B{row}="GWR",'
+                f'LOWER($E{row})="left"),$F{row},"")'
             )
-    
-            target_sheet["D41"] = (
-                '=TEXTJOIN("; ",TRUE,'
-                "'Repeat Details'!$N$2:$N$500)"
+
+            repeat_sheet.cell(row, 14).value = (
+                f'=IF(AND($B{row}="GWR",'
+                f'LOWER($E{row})="left"),$G{row},"")'
             )
-    
-            target_sheet["E41"] = (
-                '=SUM(\'Repeat Details\'!$O$2:$O$500)'
+
+            repeat_sheet.cell(row, 15).value = (
+                f'=IF(AND($B{row}="GWR",'
+                f'LOWER($E{row})="left"),$H{row},"")'
             )
-    
-            # -------------------------------------------------
-            # Hide helper columns
-            # -------------------------------------------------
-    
-            for column in ["J", "K", "L", "M", "N", "O"]:
-                repeat_sheet.column_dimensions[column].hidden = True
+
+        # -------------------------------------------------
+        # Sheet-T formulas
+        # GWR Right = row 40
+        # GWR Left  = row 41
+        # -------------------------------------------------
+
+        target_sheet["C40"] = (
+            '=TEXTJOIN("; ",TRUE,'
+            "'Repeat Details'!$J$2:$J$500)"
+        )
+
+        target_sheet["D40"] = (
+            '=TEXTJOIN("; ",TRUE,'
+            "'Repeat Details'!$K$2:$K$500)"
+        )
+
+        target_sheet["E40"] = (
+            '=SUM(\'Repeat Details\'!$L$2:$L$500)'
+        )
+
+        target_sheet["C41"] = (
+            '=TEXTJOIN("; ",TRUE,'
+            "'Repeat Details'!$M$2:$M$500)"
+        )
+
+        target_sheet["D41"] = (
+            '=TEXTJOIN("; ",TRUE,'
+            "'Repeat Details'!$N$2:$N$500)"
+        )
+
+        target_sheet["E41"] = (
+            '=SUM(\'Repeat Details\'!$O$2:$O$500)'
+        )
+
+        # -------------------------------------------------
+        # Hide helper columns
+        # -------------------------------------------------
+
+        for column in ["J", "K", "L", "M", "N", "O"]:
+            repeat_sheet.column_dimensions[column].hidden = True
     def save(self, filename):
 
         os.makedirs("output", exist_ok=True)
