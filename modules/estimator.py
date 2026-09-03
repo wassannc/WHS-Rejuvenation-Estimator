@@ -130,9 +130,10 @@ class EstimateGenerator:
                 "chainage_gwr_to", ""
             )
 
-            # Length
-            sheet.cell(output_row, 8).value = record.get(
-                "avg_length_gwr", ""
+            # Length = Chainage To - Chainage From
+            sheet.cell(output_row, 8).value = (
+                f'=IF(AND(F{output_row}<>"",G{output_row}<>""),'
+                f'G{output_row}-F{output_row},"")'
             )
 
             output_row += 1
