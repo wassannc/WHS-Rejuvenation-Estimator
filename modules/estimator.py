@@ -137,6 +137,61 @@ class EstimateGenerator:
             )
 
             output_row += 1
+    def populate_ncg_repeat(self, repeat_records, start_row=2):
+        """
+        Write NCG repeat records into Repeat Details.
+        """
+
+        sheet = self.workbook["Repeat Details"]
+
+        ncg_filename = "2.Rejuvenation_works-ncg_.csv"
+
+        if ncg_filename not in repeat_records:
+            return start_row
+
+        ncg_df = repeat_records[ncg_filename]
+
+        output_row = start_row
+
+        for record_no, (_, record) in enumerate(
+            ncg_df.iterrows(), start=1
+        ):
+
+            sheet.cell(output_row, 2).value = "NCG"
+            sheet.cell(output_row, 3).value = "New Canal Guidewall"
+            sheet.cell(output_row, 4).value = record_no
+
+            sheet.cell(output_row, 5).value = record.get(
+                "guidewalls_side", ""
+            )
+
+            sheet.cell(output_row, 6).value = record.get(
+                "ncg_-chainage_ncg_from", ""
+            )
+
+            sheet.cell(output_row, 7).value = record.get(
+                "ncg_-chainage_ncg_to", ""
+            )
+
+            # NCG length can be stored as side-specific fields
+            length = ""
+
+            side = str(
+                record.get("guidewalls_side", "")
+            ).strip().lower()
+
+            if side == "right":
+                length = record.get("length_ncg_right", "")
+            elif side == "left":
+                length = record.get("length_ncg_left", "")
+            else:
+                length = record.get("length_ncg", "")
+
+            sheet.cell(output_row, 8).value = length
+
+            output_row += 1
+
+        return output_row
     def setup_gwr_formulas(self):
         """
         Create Excel 2019+ compatible formulas that consolidate
