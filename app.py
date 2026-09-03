@@ -20,7 +20,7 @@ st.title("WHS Rejuvenation Estimation")
 def load_basic_data():
     odk = ODKCentral()
     return odk.get_basic_information()
-
+basic = load_basic_data()
 st.success(f"{len(basic)} structures loaded")
 
 # ---------------------------------------
