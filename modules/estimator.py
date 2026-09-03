@@ -98,7 +98,7 @@ class EstimateGenerator:
         gwr_filename = "2.Rejuvenation_works-gwr_.csv"
 
         if gwr_filename not in repeat_records:
-            return
+            return 2
 
         gwr_df = repeat_records[gwr_filename]
 
