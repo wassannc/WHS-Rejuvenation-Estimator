@@ -202,6 +202,17 @@ if st.button("📄 Generate Estimate", type="primary"):
                     REPAIR_FORM_ID,
                     parent_key
                 )
+                # Show actual GWR column names
+                if "2.Rejuvenation_works-gwr_.csv" in repeat_records:
+                    st.write(
+                        "GWR columns:",
+                        list(
+                            repeat_records[
+                                "2.Rejuvenation_works-gwr_.csv"
+                            ].columns
+                        )
+                    )
+
                 # Write GWR repeat records to Repeat Details
                 estimator.populate_gwr_repeat(repeat_records)
         
