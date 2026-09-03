@@ -158,55 +158,61 @@ class EstimateGenerator:
         for row in range(2, 501):
 
             if row == 2:
-                # First data row
+                # First GWR record
 
                 repeat_sheet.cell(row, 10).value = (
-                    f'=IF(AND($B{row}="GWR",'
-                    f'LOWER($E{row})="right"),$F{row},"")'
+                    f'=IF(AND($B{row}="GWR",LOWER($E{row})="right"),'
+                    f'$F{row},"")'
                 )
 
                 repeat_sheet.cell(row, 11).value = (
-                    f'=IF(AND($B{row}="GWR",'
-                    f'LOWER($E{row})="right"),$G{row},"")'
+                    f'=IF(AND($B{row}="GWR",LOWER($E{row})="right"),'
+                    f'$G{row},"")'
                 )
 
                 repeat_sheet.cell(row, 12).value = (
-                    f'=IF(AND($B{row}="GWR",'
-                    f'LOWER($E{row})="right"),$H{row},0)'
+                    f'=IF(AND($B{row}="GWR",LOWER($E{row})="right"),'
+                    f'$H{row},0)'
                 )
 
                 repeat_sheet.cell(row, 13).value = (
-                    f'=IF(AND($B{row}="GWR",'
-                    f'LOWER($E{row})="left"),$F{row},"")'
+                    f'=IF(AND($B{row}="GWR",LOWER($E{row})="left"),'
+                    f'$F{row},"")'
                 )
 
                 repeat_sheet.cell(row, 14).value = (
-                    f'=IF(AND($B{row}="GWR",'
-                    f'LOWER($E{row})="left"),$G{row},"")'
+                    f'=IF(AND($B{row}="GWR",LOWER($E{row})="left"),'
+                    f'$G{row},"")'
                 )
 
                 repeat_sheet.cell(row, 15).value = (
-                    f'=IF(AND($B{row}="GWR",'
-                    f'LOWER($E{row})="left"),$H{row},0)'
+                    f'=IF(AND($B{row}="GWR",LOWER($E{row})="left"),'
+                    f'$H{row},0)'
                 )
 
             else:
-                # Subsequent rows: build cumulative chainage text
+                # Keep the previous total when the row belongs
+                # to the opposite side, and add when it matches.
 
+                # RIGHT - Chainage From
                 repeat_sheet.cell(row, 10).value = (
                     f'=IF(AND($B{row}="GWR",'
                     f'LOWER($E{row})="right"),'
-                    f'IF(J{row-1}<>"",J{row-1}&"; ","")&$F{row},'
+                    f'IF(J{row-1}="",TEXT($F{row},"0.0"),'
+                    f'J{row-1}&"; "&TEXT($F{row},"0.0")),'
                     f'J{row-1})'
                 )
 
+                # RIGHT - Chainage To
                 repeat_sheet.cell(row, 11).value = (
                     f'=IF(AND($B{row}="GWR",'
                     f'LOWER($E{row})="right"),'
-                    f'IF(K{row-1}<>"",K{row-1}&"; ","")&$G{row},'
+                    f'IF(K{row-1}="",TEXT($G{row},"0.0"),'
+                    f'K{row-1}&"; "&TEXT($G{row},"0.0")),'
                     f'K{row-1})'
                 )
 
+                # RIGHT - Length
                 repeat_sheet.cell(row, 12).value = (
                     f'=IF(AND($B{row}="GWR",'
                     f'LOWER($E{row})="right"),'
@@ -214,27 +220,31 @@ class EstimateGenerator:
                     f'L{row-1})'
                 )
 
+                # LEFT - Chainage From
                 repeat_sheet.cell(row, 13).value = (
                     f'=IF(AND($B{row}="GWR",'
                     f'LOWER($E{row})="left"),'
-                    f'IF(M{row-1}<>"",M{row-1}&"; ","")&$F{row},'
+                    f'IF(M{row-1}="",TEXT($F{row},"0.0"),'
+                    f'M{row-1}&"; "&TEXT($F{row},"0.0")),'
                     f'M{row-1})'
                 )
 
+                # LEFT - Chainage To
                 repeat_sheet.cell(row, 14).value = (
                     f'=IF(AND($B{row}="GWR",'
                     f'LOWER($E{row})="left"),'
-                    f'IF(N{row-1}<>"",N{row-1}&"; ","")&$G{row},'
+                    f'IF(N{row-1}="",TEXT($G{row},"0.0"),'
+                    f'N{row-1}&"; "&TEXT($G{row},"0.0")),'
                     f'N{row-1})'
                 )
 
+                # LEFT - Length
                 repeat_sheet.cell(row, 15).value = (
                     f'=IF(AND($B{row}="GWR",'
                     f'LOWER($E{row})="left"),'
                     f'O{row-1}+$H{row},'
                     f'O{row-1})'
                 )
-
         # -------------------------------------------------
         # Sheet-T
         # GWR Right = row 40
