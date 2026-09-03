@@ -234,6 +234,55 @@ class EstimateGenerator:
             target_sheet["D20"] = ""
     
         return output_row
+            output_row += 1
+
+    return output_row
+
+    def populate_cghi_repeat(self, repeat_records, start_row=2):
+        """
+        Write Canal Guidewall Height Increase repeat records
+        into Repeat Details.
+        """
+    
+        sheet = self.workbook["Repeat Details"]
+    
+        cghi_filename = "2.Rejuvenation_works-Canal_guidewall_height_increase_.csv"
+    
+        if cghi_filename not in repeat_records:
+            return start_row
+    
+        cghi_df = repeat_records[cghi_filename]
+    
+        output_row = start_row
+    
+        for record_no, (_, record) in enumerate(
+            cghi_df.iterrows(), start=1
+        ):
+    
+            sheet.cell(output_row, 2).value = "CGHI"
+            sheet.cell(output_row, 3).value = "Increasing height of guide wall"
+            sheet.cell(output_row, 4).value = record_no
+    
+            sheet.cell(output_row, 6).value = record.get(
+                "Canal_guidewall_height_increase_-chainage_canal_guidewall_height_increase_from",
+                ""
+            )
+    
+            sheet.cell(output_row, 7).value = record.get(
+                "Canal_guidewall_height_increase_-chainage_canal_guidewall_height_increase_to",
+                ""
+            )
+    
+            # Length = Chainage To - Chainage From
+            sheet.cell(output_row, 8).value = (
+                f'=IF(AND(F{output_row}<>"",G{output_row}<>""),'
+                f'G{output_row}-F{output_row},"")'
+            )
+    
+            output_row += 1
+    
+        return output_row
+    
     def setup_gwr_formulas(self):
         """
         Create Excel 2019+ compatible formulas that consolidate
