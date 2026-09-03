@@ -50,72 +50,73 @@ class ODKCentral:
                 + response.text[:500]
             )
 
-      def get_form_export_files(self, form_id):
-          """
-          Download the complete ODK CSV ZIP export
-          and return the names of the CSV files inside it.
-          """
+    def get_form_export_files(self, form_id):
+        """
+        Download the complete ODK CSV ZIP export
+        and return the names of the CSV files inside it.
+        """
 
-          url = (
-              f"{self.base_url}/v1/projects/"
-              f"{self.project_id}/forms/{form_id}/submissions.csv.zip"
-          )
+        url = (
+            f"{self.base_url}/v1/projects/"
+            f"{self.project_id}/forms/{form_id}/submissions.csv.zip"
+        )
 
-          response = requests.get(url, auth=self.auth)
+        response = requests.get(url, auth=self.auth)
 
-          if response.status_code != 200:
-              raise Exception(
-                  f"ODK ZIP Export Error {response.status_code}\n"
-                  f"{response.text}"
-              )
-
-          with ZipFile(BytesIO(response.content)) as z:
-              return z.namelist()
-
-        def get_repeat_records(self, form_id, parent_key):
-            """
-            Get repeat records belonging to one selected repair submission.
-            Matches root KEY with repeat PARENT_KEY.
-            """
-
-            url = (
-                f"{self.base_url}/v1/projects/"
-                f"{self.project_id}/forms/{form_id}/submissions.csv.zip"
+        if response.status_code != 200:
+            raise Exception(
+                f"ODK ZIP Export Error {response.status_code}\n"
+                f"{response.text}"
             )
 
-            response = requests.get(url, auth=self.auth)
+        with ZipFile(BytesIO(response.content)) as z:
+            return z.namelist()
 
-            if response.status_code != 200:
-                raise Exception(
-                    f"ODK ZIP Export Error {response.status_code}\n"
-                    f"{response.text}"
-                )  
+    def get_repeat_records(self, form_id, parent_key):
+        """
+        Get repeat records belonging to one selected repair submission.
 
-            results = {}
+        Matches the root repair KEY with the repeat PARENT_KEY.
+        """
 
-            with ZipFile(BytesIO(response.content)) as z:
+        url = (
+            f"{self.base_url}/v1/projects/"
+            f"{self.project_id}/forms/{form_id}/submissions.csv.zip"
+        )
 
-                for filename in z.namelist():
-  
-                    if not filename.lower().endswith(".csv"):
-                        continue
+        response = requests.get(url, auth=self.auth)
 
-                    with z.open(filename) as file:
-                        df = pd.read_csv(file, dtype=str)
+        if response.status_code != 200:
+            raise Exception(
+                f"ODK ZIP Export Error {response.status_code}\n"
+                f"{response.text}"
+            )
 
-                    if "PARENT_KEY" not in df.columns:
-                        continue
+        results = {}
 
-                    matched = df[
-                        df["PARENT_KEY"].astype(str).str.strip()
-                        == str(parent_key).strip()
-                    ].copy()
+        with ZipFile(BytesIO(response.content)) as z:
 
-                    if not matched.empty:
-                        results[filename] = matched.reset_index(drop=True)
+            for filename in z.namelist():
 
-            return results
-    
+                if not filename.lower().endswith(".csv"):
+                    continue
+
+                with z.open(filename) as file:
+                    df = pd.read_csv(file, dtype=str)
+
+                if "PARENT_KEY" not in df.columns:
+                    continue
+
+                matched = df[
+                    df["PARENT_KEY"].astype(str).str.strip()
+                    == str(parent_key).strip()
+                ].copy()
+
+                if not matched.empty:
+                    results[filename] = matched.reset_index(drop=True)
+
+        return results
+
     def get_basic_information(self):
         return self.get_form_data(BASIC_FORM_ID)
 
