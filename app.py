@@ -202,6 +202,8 @@ if st.button("📄 Generate Estimate", type="primary"):
                     REPAIR_FORM_ID,
                     parent_key
                 )
+                # Write GWR repeat records to Repeat Details
+                estimator.populate_gwr_repeat(repeat_records)
         
                 st.write("Repeat records found:")
         
