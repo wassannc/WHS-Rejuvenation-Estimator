@@ -136,99 +136,125 @@ class EstimateGenerator:
             )
 
             output_row += 1
-    def setup_gwr_formulas(self):
-        """
-        Create Excel formulas that consolidate GWR records
-        from Repeat Details into Input Data Sheet-T.
-
-        Designed for Excel 2019+.
-        """
-
-        repeat_sheet = self.workbook["Repeat Details"]
-        target_sheet = self.workbook["Input Data Sheet-T"]
-
-        # -------------------------------------------------
-        # Hidden helper columns
-        # J = Right From
-        # K = Right To
-        # L = Right Length
-        # M = Left From
-        # N = Left To
-        # O = Left Length
-        # -------------------------------------------------
-
-        for row in range(2, 501):
-
-            repeat_sheet.cell(row, 10).value = (
-                f'=IF(AND($B{row}="GWR",'
-                f'LOWER($E{row})="right"),$F{row},"")'
-            )
-
-            repeat_sheet.cell(row, 11).value = (
-                f'=IF(AND($B{row}="GWR",'
-                f'LOWER($E{row})="right"),$G{row},"")'
-            )
-
-            repeat_sheet.cell(row, 12).value = (
-                f'=IF(AND($B{row}="GWR",'
-                f'LOWER($E{row})="right"),$H{row},"")'
-            )
-
-            repeat_sheet.cell(row, 13).value = (
-                f'=IF(AND($B{row}="GWR",'
-                f'LOWER($E{row})="left"),$F{row},"")'
-            )
-
-            repeat_sheet.cell(row, 14).value = (
-                f'=IF(AND($B{row}="GWR",'
-                f'LOWER($E{row})="left"),$G{row},"")'
-            )
-
-            repeat_sheet.cell(row, 15).value = (
-                f'=IF(AND($B{row}="GWR",'
-                f'LOWER($E{row})="left"),$H{row},"")'
-            )
-
-        # -------------------------------------------------
-        # Sheet-T formulas
-        # GWR Right = row 40
-        # GWR Left  = row 41
-        # -------------------------------------------------
-
-        target_sheet["C40"] = (
-            '=TEXTJOIN("; ",TRUE,'
-            "'Repeat Details'!$J$2:$J$500)"
-        )
-
-        target_sheet["D40"] = (
-            '=TEXTJOIN("; ",TRUE,'
-            "'Repeat Details'!$K$2:$K$500)"
-        )
-
-        target_sheet["E40"] = (
-            '=SUM(\'Repeat Details\'!$L$2:$L$500)'
-        )
-
-        target_sheet["C41"] = (
-            '=TEXTJOIN("; ",TRUE,'
-            "'Repeat Details'!$M$2:$M$500)"
-        )
-
-        target_sheet["D41"] = (
-            '=TEXTJOIN("; ",TRUE,'
-            "'Repeat Details'!$N$2:$N$500)"
-        )
-
-        target_sheet["E41"] = (
-            '=SUM(\'Repeat Details\'!$O$2:$O$500)'
-        )
-
-        # -------------------------------------------------
-        # Hide helper columns
-        # -------------------------------------------------
-
-        for column in ["J", "K", "L", "M", "N", "O"]:
-            repeat_sheet.column_dimensions[column].hidden = True
+        def setup_gwr_formulas(self):
+            """
+            Create Excel 2019+ compatible formulas that consolidate
+            GWR records from Repeat Details into Input Data Sheet-T.
+            """
+    
+            repeat_sheet = self.workbook["Repeat Details"]
+            target_sheet = self.workbook["Input Data Sheet-T"]
+    
+            # -------------------------------------------------
+            # Helper columns
+            # J = Right From
+            # K = Right To
+            # L = Right Length
+            # M = Left From
+            # N = Left To
+            # O = Left Length
+            # -------------------------------------------------
+    
+            for row in range(2, 501):
+    
+                if row == 2:
+                    # First data row
+    
+                    repeat_sheet.cell(row, 10).value = (
+                        f'=IF(AND($B{row}="GWR",'
+                        f'LOWER($E{row})="right"),$F{row},"")'
+                    )
+    
+                    repeat_sheet.cell(row, 11).value = (
+                        f'=IF(AND($B{row}="GWR",'
+                        f'LOWER($E{row})="right"),$G{row},"")'
+                    )
+    
+                    repeat_sheet.cell(row, 12).value = (
+                        f'=IF(AND($B{row}="GWR",'
+                        f'LOWER($E{row})="right"),$H{row},0)'
+                    )
+    
+                    repeat_sheet.cell(row, 13).value = (
+                        f'=IF(AND($B{row}="GWR",'
+                        f'LOWER($E{row})="left"),$F{row},"")'
+                    )
+    
+                    repeat_sheet.cell(row, 14).value = (
+                        f'=IF(AND($B{row}="GWR",'
+                        f'LOWER($E{row})="left"),$G{row},"")'
+                    )
+    
+                    repeat_sheet.cell(row, 15).value = (
+                        f'=IF(AND($B{row}="GWR",'
+                        f'LOWER($E{row})="left"),$H{row},0)'
+                    )
+    
+                else:
+                    # Subsequent rows: build cumulative chainage text
+    
+                    repeat_sheet.cell(row, 10).value = (
+                        f'=IF(AND($B{row}="GWR",'
+                        f'LOWER($E{row})="right"),'
+                        f'IF(J{row-1}<>"",J{row-1}&"; ","")&$F{row},'
+                        f'J{row-1})'
+                    )
+    
+                    repeat_sheet.cell(row, 11).value = (
+                        f'=IF(AND($B{row}="GWR",'
+                        f'LOWER($E{row})="right"),'
+                        f'IF(K{row-1}<>"",K{row-1}&"; ","")&$G{row},'
+                        f'K{row-1})'
+                    )
+    
+                    repeat_sheet.cell(row, 12).value = (
+                        f'=IF(AND($B{row}="GWR",'
+                        f'LOWER($E{row})="right"),'
+                        f'L{row-1}+$H{row},'
+                        f'L{row-1})'
+                    )
+    
+                    repeat_sheet.cell(row, 13).value = (
+                        f'=IF(AND($B{row}="GWR",'
+                        f'LOWER($E{row})="left"),'
+                        f'IF(M{row-1}<>"",M{row-1}&"; ","")&$F{row},'
+                        f'M{row-1})'
+                    )
+    
+                    repeat_sheet.cell(row, 14).value = (
+                        f'=IF(AND($B{row}="GWR",'
+                        f'LOWER($E{row})="left"),'
+                        f'IF(N{row-1}<>"",N{row-1}&"; ","")&$G{row},'
+                        f'N{row-1})'
+                    )
+    
+                    repeat_sheet.cell(row, 15).value = (
+                        f'=IF(AND($B{row}="GWR",'
+                        f'LOWER($E{row})="left"),'
+                        f'O{row-1}+$H{row},'
+                        f'O{row-1})'
+                    )
+    
+            # -------------------------------------------------
+            # Sheet-T
+            # GWR Right = row 40
+            # GWR Left  = row 41
+            # -------------------------------------------------
+    
+            target_sheet["C40"] = "='Repeat Details'!J500"
+            target_sheet["D40"] = "='Repeat Details'!K500"
+            target_sheet["E40"] = "='Repeat Details'!L500"
+    
+            target_sheet["C41"] = "='Repeat Details'!M500"
+            target_sheet["D41"] = "='Repeat Details'!N500"
+            target_sheet["E41"] = "='Repeat Details'!O500"
+    
+            # -------------------------------------------------
+            # Hide helper columns
+            # -------------------------------------------------
+    
+            for column in ["J", "K", "L", "M", "N", "O"]:
+                repeat_sheet.column_dimensions[column].hidden = True
     def save(self, filename):
 
         os.makedirs("output", exist_ok=True)
