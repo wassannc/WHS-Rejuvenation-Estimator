@@ -138,6 +138,7 @@ class EstimateGenerator:
 
             output_row += 1
         return output_row
+    
     def populate_ncg_repeat(self, repeat_records, start_row=2):
         """
         Write NCG repeat records into Repeat Details.
