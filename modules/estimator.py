@@ -84,7 +84,58 @@ class EstimateGenerator:
             "C70",
             "Mamidipalli"
         )
+    def populate_gwr_repeat(self, repeat_records):
+        """
+        Write GWR repeat records into the Repeat Details sheet.
+        """
 
+        sheet = self.workbook["Repeat Details"]
+
+        # Start writing from row 2
+        output_row = 2
+
+        # GWR CSV filename from ODK ZIP export
+        gwr_filename = "2.Rejuvenation_works-gwr_.csv"
+
+        if gwr_filename not in repeat_records:
+            return
+
+        gwr_df = repeat_records[gwr_filename]
+
+        for record_no, (_, record) in enumerate(
+            gwr_df.iterrows(), start=1
+        ):
+
+            # Repeat Group
+            sheet.cell(output_row, 2).value = "GWR"
+
+            # Parameter / Work
+            sheet.cell(output_row, 3).value = "Guide Wall Repair"
+
+            # Record No
+            sheet.cell(output_row, 4).value = record_no
+
+            # Side
+            sheet.cell(output_row, 5).value = record.get(
+                "gwr_-gwr_side", ""
+            )
+
+            # Chainage From
+            sheet.cell(output_row, 6).value = record.get(
+                "gwr_-chainage_gwr_from", ""
+            )
+
+            # Chainage To
+            sheet.cell(output_row, 7).value = record.get(
+                "gwr_-chainage_gwr_to", ""
+            )
+
+            # Length
+            sheet.cell(output_row, 8).value = record.get(
+                "avg_length_gwr", ""
+            )
+
+            output_row += 1
     def save(self, filename):
 
         os.makedirs("output", exist_ok=True)
