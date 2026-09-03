@@ -72,6 +72,50 @@ class ODKCentral:
         with ZipFile(BytesIO(response.content)) as z:
             return z.namelist()
 
+     def get_repeat_records(self, form_id, parent_key):
+        """
+        Get repeat records belonging to one selected repair submission.
+        Matches root KEY with repeat PARENT_KEY.
+        """
+
+        url = (
+            f"{self.base_url}/v1/projects/"
+            f"{self.project_id}/forms/{form_id}/submissions.csv.zip"
+        )
+
+        response = requests.get(url, auth=self.auth)
+
+        if response.status_code != 200:
+            raise Exception(
+                f"ODK ZIP Export Error {response.status_code}\n"
+                f"{response.text}"
+            )
+
+        results = {}
+
+        with ZipFile(BytesIO(response.content)) as z:
+
+            for filename in z.namelist():
+
+                if not filename.lower().endswith(".csv"):
+                    continue
+
+                with z.open(filename) as file:
+                    df = pd.read_csv(file, dtype=str)
+
+                if "PARENT_KEY" not in df.columns:
+                    continue
+
+                matched = df[
+                    df["PARENT_KEY"].astype(str).str.strip()
+                    == str(parent_key).strip()
+                ].copy()
+
+                if not matched.empty:
+                    results[filename] = matched.reset_index(drop=True)
+
+        return results
+    
     def get_basic_information(self):
         return self.get_form_data(BASIC_FORM_ID)
 
