@@ -413,6 +413,37 @@ class EstimateGenerator:
 
         for column in ["J", "K", "L", "M", "N", "O"]:
             repeat_sheet.column_dimensions[column].hidden = True
+    def setup_cghi_formulas(self):
+        """
+        Consolidate CGHI records from Repeat Details
+        into Input Data Sheet-T.
+        """
+    
+        repeat_sheet = self.workbook["Repeat Details"]
+        target_sheet = self.workbook["Input Data Sheet-T"]
+    
+        # -------------------------------------------------
+        # CGHI total length
+        # -------------------------------------------------
+    
+        target_sheet["E42"] = (
+            '=SUMIF(\'Repeat Details\'!$B$2:$B$500,"CGHI",'
+            '\'Repeat Details\'!$H$2:$H$500)'
+        )
+    
+        # -------------------------------------------------
+        # CGHI chainages
+        # -------------------------------------------------
+    
+        target_sheet["C42"] = (
+            '=IFERROR(INDEX(\'Repeat Details\'!$F$2:$F$500,'
+            'MATCH("CGHI",\'Repeat Details\'!$B$2:$B$500,0)),"")'
+        )
+    
+        target_sheet["D42"] = (
+            '=IFERROR(INDEX(\'Repeat Details\'!$G$2:$G$500,'
+            'MATCH("CGHI",\'Repeat Details\'!$B$2:$B$500,0)),"")'
+        )
     def save(self, filename):
 
         os.makedirs("output", exist_ok=True)
