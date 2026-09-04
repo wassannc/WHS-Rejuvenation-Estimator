@@ -259,7 +259,11 @@ class EstimateGenerator:
             sheet.cell(output_row, 2).value = "CGHI"
             sheet.cell(output_row, 3).value = "Increasing height of guide wall"
             sheet.cell(output_row, 4).value = record_no
-    
+            sheet.cell(output_row, 5).value = record.get(
+                "canal_guidewall_height_increase_side",
+                ""
+            )
+
             sheet.cell(output_row, 6).value = record.get(
                 "chainage_canal_guidewall_height_increase_from",
                 ""
