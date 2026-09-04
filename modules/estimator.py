@@ -413,37 +413,143 @@ class EstimateGenerator:
 
         for column in ["J", "K", "L", "M", "N", "O"]:
             repeat_sheet.column_dimensions[column].hidden = True
+    
     def setup_cghi_formulas(self):
         """
         Consolidate CGHI records from Repeat Details
-        into Input Data Sheet-T.
+        separately for Right and Left sides.
         """
     
         repeat_sheet = self.workbook["Repeat Details"]
         target_sheet = self.workbook["Input Data Sheet-T"]
     
         # -------------------------------------------------
-        # CGHI total length
+        # Helper columns
+        #
+        # P = Right From
+        # Q = Right To
+        # R = Right Length
+        # S = Left From
+        # T = Left To
+        # U = Left Length
         # -------------------------------------------------
     
-        target_sheet["E42"] = (
-            '=SUMIF(\'Repeat Details\'!$B$2:$B$500,"CGHI",'
-            '\'Repeat Details\'!$H$2:$H$500)'
-        )
+        for row in range(2, 501):
+    
+            if row == 2:
+    
+                # RIGHT
+                repeat_sheet.cell(row, 16).value = (
+                    f'=IF(AND($B{row}="CGHI",'
+                    f'LOWER($E{row})="right"),'
+                    f'TEXT($F{row},"0.0"),"")'
+                )
+    
+                repeat_sheet.cell(row, 17).value = (
+                    f'=IF(AND($B{row}="CGHI",'
+                    f'LOWER($E{row})="right"),'
+                    f'TEXT($G{row},"0.0"),"")'
+                )
+    
+                repeat_sheet.cell(row, 18).value = (
+                    f'=IF(AND($B{row}="CGHI",'
+                    f'LOWER($E{row})="right"),'
+                    f'$H{row},0)'
+                )
+    
+                # LEFT
+                repeat_sheet.cell(row, 19).value = (
+                    f'=IF(AND($B{row}="CGHI",'
+                    f'LOWER($E{row})="left"),'
+                    f'TEXT($F{row},"0.0"),"")'
+                )
+    
+                repeat_sheet.cell(row, 20).value = (
+                    f'=IF(AND($B{row}="CGHI",'
+                    f'LOWER($E{row})="left"),'
+                    f'TEXT($G{row},"0.0"),"")'
+                )
+    
+                repeat_sheet.cell(row, 21).value = (
+                    f'=IF(AND($B{row}="CGHI",'
+                    f'LOWER($E{row})="left"),'
+                    f'$H{row},0)'
+                )
+    
+            else:
+    
+                # RIGHT - From
+                repeat_sheet.cell(row, 16).value = (
+                    f'=IF(AND($B{row}="CGHI",'
+                    f'LOWER($E{row})="right"),'
+                    f'IF(P{row-1}="",TEXT($F{row},"0.0"),'
+                    f'P{row-1}&"; "&TEXT($F{row},"0.0")),'
+                    f'P{row-1})'
+                )
+    
+                # RIGHT - To
+                repeat_sheet.cell(row, 17).value = (
+                    f'=IF(AND($B{row}="CGHI",'
+                    f'LOWER($E{row})="right"),'
+                    f'IF(Q{row-1}="",TEXT($G{row},"0.0"),'
+                    f'Q{row-1}&"; "&TEXT($G{row},"0.0")),'
+                    f'Q{row-1})'
+                )
+    
+                # RIGHT - Length
+                repeat_sheet.cell(row, 18).value = (
+                    f'=IF(AND($B{row}="CGHI",'
+                    f'LOWER($E{row})="right"),'
+                    f'R{row-1}+$H{row},'
+                    f'R{row-1})'
+                )
+    
+                # LEFT - From
+                repeat_sheet.cell(row, 19).value = (
+                    f'=IF(AND($B{row}="CGHI",'
+                    f'LOWER($E{row})="left"),'
+                    f'IF(S{row-1}="",TEXT($F{row},"0.0"),'
+                    f'S{row-1}&"; "&TEXT($F{row},"0.0")),'
+                    f'S{row-1})'
+                )
+    
+                # LEFT - To
+                repeat_sheet.cell(row, 20).value = (
+                    f'=IF(AND($B{row}="CGHI",'
+                    f'LOWER($E{row})="left"),'
+                    f'IF(T{row-1}="",TEXT($G{row},"0.0"),'
+                    f'T{row-1}&"; "&TEXT($G{row},"0.0")),'
+                    f'T{row-1})'
+                )
+    
+                # LEFT - Length
+                repeat_sheet.cell(row, 21).value = (
+                    f'=IF(AND($B{row}="CGHI",'
+                    f'LOWER($E{row})="left"),'
+                    f'U{row-1}+$H{row},'
+                    f'U{row-1})'
+                )
     
         # -------------------------------------------------
-        # CGHI chainages
+        # Sheet-T
         # -------------------------------------------------
     
-        target_sheet["C42"] = (
-            '=IFERROR(INDEX(\'Repeat Details\'!$F$2:$F$500,'
-            'MATCH("CGHI",\'Repeat Details\'!$B$2:$B$500,0)),"")'
-        )
+        # Right side → Row 42
+        target_sheet["C42"] = "='Repeat Details'!P500"
+        target_sheet["D42"] = "='Repeat Details'!Q500"
+        target_sheet["E42"] = "='Repeat Details'!R500"
     
-        target_sheet["D42"] = (
-            '=IFERROR(INDEX(\'Repeat Details\'!$G$2:$G$500,'
-            'MATCH("CGHI",\'Repeat Details\'!$B$2:$B$500,0)),"")'
-        )
+        # Left side → Row 43
+        target_sheet["C43"] = "='Repeat Details'!S500"
+        target_sheet["D43"] = "='Repeat Details'!T500"
+        target_sheet["E43"] = "='Repeat Details'!U500"
+    
+        # -------------------------------------------------
+        # Hide helper columns
+        # -------------------------------------------------
+    
+        for column in ["P", "Q", "R", "S", "T", "U"]:
+            repeat_sheet.column_dimensions[column].hidden = True
     def save(self, filename):
 
         os.makedirs("output", exist_ok=True)
