@@ -283,6 +283,131 @@ class EstimateGenerator:
             output_row += 1
     
         return output_row
+    def populate_gwbjl_repeat(self, repeat_records, start_row=2):
+        """
+        Write GWBJL repeat records into Repeat Details
+        and populate E50/E51 in Input Data Sheet-T.
+    
+        Leak 1 -> E50
+        Leak 2 -> E51
+        """
+    
+        repeat_sheet = self.workbook["Repeat Details"]
+        target_sheet = self.workbook["Input Data Sheet-T"]
+    
+        gwbjl_filename = "2.Rejuvenation_works-gwbjl_.csv"
+    
+        if gwbjl_filename not in repeat_records:
+            return start_row
+    
+        gwbjl_df = repeat_records[gwbjl_filename]
+    
+        output_row = start_row
+    
+        leak1_total = 0
+        leak2_total = 0
+    
+        for record_no, (_, record) in enumerate(
+            gwbjl_df.iterrows(), start=1
+        ):
+    
+            # ---------------------------------------------
+            # Common information
+            # ---------------------------------------------
+    
+            repeat_sheet.cell(output_row, 2).value = "GWBJL"
+            repeat_sheet.cell(
+                output_row, 3
+            ).value = "Hunch through bed and guidewall joint"
+    
+            repeat_sheet.cell(output_row, 4).value = record_no
+    
+            # ---------------------------------------------
+            # Chainage
+            # ---------------------------------------------
+    
+            chainage_from = record.get(
+                "gwbjl_-leak1_gwbjl_chinage_from", ""
+            )
+    
+            chainage_to = record.get(
+                "gwbjl_-leak1_gwbjl_chinage_to", ""
+            )
+    
+            repeat_sheet.cell(output_row, 6).value = chainage_from
+            repeat_sheet.cell(output_row, 7).value = chainage_to
+    
+            # ---------------------------------------------
+            # Leak 1
+            # ---------------------------------------------
+    
+            leak1 = record.get(
+                "gwbjl_-leakage_canal_length_gwbjl_leak1",
+                ""
+            )
+    
+            try:
+                leak1_value = float(leak1) if leak1 not in ["", None] else 0
+            except (ValueError, TypeError):
+                leak1_value = 0
+    
+            leak1_total += leak1_value
+    
+            repeat_sheet.cell(
+                output_row, 8
+            ).value = leak1
+    
+            output_row += 1
+    
+            # ---------------------------------------------
+            # Leak 2
+            # ---------------------------------------------
+    
+            leak2 = record.get(
+                "gwbjl_-leakage_canal_length_gwbjl_leak2",
+                ""
+            )
+    
+            try:
+                leak2_value = float(leak2) if leak2 not in ["", None] else 0
+            except (ValueError, TypeError):
+                leak2_value = 0
+    
+            leak2_total += leak2_value
+    
+            repeat_sheet.cell(output_row, 2).value = "GWBJL"
+            repeat_sheet.cell(
+                output_row, 3
+            ).value = "Hunch through bed and guidewall joint"
+    
+            repeat_sheet.cell(output_row, 4).value = f"{record_no}-2"
+    
+            repeat_sheet.cell(
+                output_row, 6
+            ).value = record.get(
+                "gwbjl_-leak1_gwbjl_chinage_from", ""
+            )
+    
+            repeat_sheet.cell(
+                output_row, 7
+            ).value = record.get(
+                "gwbjl_-leak1_gwbjl_chinage_to", ""
+            )
+    
+            repeat_sheet.cell(
+                output_row, 8
+            ).value = leak2
+    
+            output_row += 1
+    
+        # ---------------------------------------------
+        # Populate Sheet-T
+        # ---------------------------------------------
+    
+        target_sheet["E50"] = leak1_total
+        target_sheet["E51"] = leak2_total
+    
+        return output_row
     
     def setup_gwr_formulas(self):
         """
