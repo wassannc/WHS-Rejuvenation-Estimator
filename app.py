@@ -221,6 +221,7 @@ if st.button("📄 Generate Estimate", type="primary"):
                 )
                 estimator.setup_gwr_formulas()
                 estimator.setup_cghi_formulas()
+                estimator.setup_gwbjl_formulas()
         
                 st.write("Repeat records found:")
         
