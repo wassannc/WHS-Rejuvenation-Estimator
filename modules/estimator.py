@@ -495,7 +495,10 @@ class EstimateGenerator:
     
             repeat_sheet.cell(
                 output_row, 8
-            ).value = leak1
+            ).value = (
+                f'=IF(AND(F{output_row}<>"",G{output_row}<>""),'
+                f'G{output_row}-F{output_row},"")'
+            )
     
             output_row += 1
     
@@ -531,7 +534,10 @@ class EstimateGenerator:
     
             repeat_sheet.cell(
                 output_row, 8
-            ).value = leak2
+            ).value = (
+                f'=IF(AND(F{output_row}<>"",G{output_row}<>""),'
+                f'G{output_row}-F{output_row},"")'
+            )
     
             output_row += 1
     
