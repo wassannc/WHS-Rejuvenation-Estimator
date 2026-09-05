@@ -482,14 +482,14 @@ class EstimateGenerator:
             repeat_sheet.cell(
                 output_row, 6
             ).value = record.get(
-                "ltcb_-leak1_ltcb_chinage_from",
+                "leak1_ltcb_chinage_from",
                 ""
             )
     
             repeat_sheet.cell(
                 output_row, 7
             ).value = record.get(
-                "ltcb_-leak1_ltcb_chinage_to",
+                "leak1_ltcb_chinage_to",
                 ""
             )
     
@@ -504,7 +504,7 @@ class EstimateGenerator:
             # -------------------------------------------------
     
             leak2 = record.get(
-                "ltcb_-canal_damaged_length_leak2",
+                "canal_damaged_length_leak2",
                 ""
             )
     
@@ -518,14 +518,14 @@ class EstimateGenerator:
             repeat_sheet.cell(
                 output_row, 6
             ).value = record.get(
-                "ltcb_-leak1_ltcb_chinage_from",
+                "leak1_ltcb_chinage_from",
                 ""
             )
     
             repeat_sheet.cell(
                 output_row, 7
             ).value = record.get(
-                "ltcb_-leak1_ltcb_chinage_to",
+                "leak1_ltcb_chinage_to",
                 ""
             )
     
