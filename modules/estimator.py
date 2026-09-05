@@ -356,9 +356,10 @@ class EstimateGenerator:
             leak1_total += leak1_value
     
             leak1_total += leak1_value
-            repeat_sheet.cell(
-                output_row, 8
-            ).value = leak1_value
+            repeat_sheet.cell(output_row, 8).value = (
+                f'=IF(AND(F{output_row}<>"",G{output_row}<>""),'
+                f'G{output_row}-F{output_row},"")'
+            )
     
             output_row += 1
     
@@ -399,9 +400,10 @@ class EstimateGenerator:
             )
     
             leak2_total += leak2_value
-            repeat_sheet.cell(
-                output_row, 8
-            ).value = leak2_value
+            repeat_sheet.cell(output_row, 8).value = (
+                f'=IF(AND(F{output_row}<>"",G{output_row}<>""),'
+                f'G{output_row}-F{output_row},"")'
+            )
     
             output_row += 1
     
