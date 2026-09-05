@@ -385,13 +385,13 @@ class EstimateGenerator:
             repeat_sheet.cell(
                 output_row, 6
             ).value = record.get(
-                "gwbjl_-leak1_gwbjl_chinage_from", ""
+                "leak1_gwbjl_chinage_from", ""
             )
     
             repeat_sheet.cell(
                 output_row, 7
             ).value = record.get(
-                "gwbjl_-leak1_gwbjl_chinage_to", ""
+                "leak1_gwbjl_chinage_to", ""
             )
     
             repeat_sheet.cell(
