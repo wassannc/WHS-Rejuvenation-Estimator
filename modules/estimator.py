@@ -381,6 +381,8 @@ class EstimateGenerator:
             ).value = "Hunch through bed and guidewall joint"
     
             repeat_sheet.cell(output_row, 4).value = record_no
+            repeat_sheet.cell(output_row, 5).value = "right"
+            repeat_sheet.cell(output_row, 4).value = record_no
             repeat_sheet.cell(output_row, 5).value = "left"
     
             repeat_sheet.cell(
