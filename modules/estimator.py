@@ -327,11 +327,11 @@ class EstimateGenerator:
             # ---------------------------------------------
     
             chainage_from = record.get(
-                "gwbjl_-leak1_gwbjl_chinage_from", ""
+                "leak1_gwbjl_chinage_from", ""
             )
     
             chainage_to = record.get(
-                "gwbjl_-leak1_gwbjl_chinage_to", ""
+                "leak1_gwbjl_chinage_to", ""
             )
     
             repeat_sheet.cell(output_row, 6).value = chainage_from
@@ -342,7 +342,7 @@ class EstimateGenerator:
             # ---------------------------------------------
     
             leak1 = record.get(
-                "gwbjl_-leakage_canal_length_gwbjl_leak1",
+                "leakage_canal_length_gwbjl_leak1",
                 ""
             )
     
@@ -364,7 +364,7 @@ class EstimateGenerator:
             # ---------------------------------------------
     
             leak2 = record.get(
-                "gwbjl_-leakage_canal_length_gwbjl_leak2",
+                "leakage_canal_length_gwbjl_leak2",
                 ""
             )
     
