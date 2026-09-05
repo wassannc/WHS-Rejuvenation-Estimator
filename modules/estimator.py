@@ -795,11 +795,11 @@ class EstimateGenerator:
         # Left  = row 51
         # -------------------------------------------------
     
-        target_sheet["C50"] = "='Repeat Details'!O500
-        target_sheet["D50"] = "='Repeat Details'!P500
-    
-        target_sheet["C51"] = "='Repeat Details'!Q500
-        target_sheet["D51"] = "='Repeat Details'!R500
+        target_sheet["C50"] = "='Repeat Details'!J500"
+        target_sheet["D50"] = "='Repeat Details'!K500"
+        
+        target_sheet["C51"] = "='Repeat Details'!L500"
+        target_sheet["D51"] = "='Repeat Details'!M500"
     
         # -------------------------------------------------
         # Hide helper columns
