@@ -380,7 +380,8 @@ class EstimateGenerator:
                 output_row, 3
             ).value = "Hunch through bed and guidewall joint"
     
-            repeat_sheet.cell(output_row, 4).value = f"{record_no}-2"
+            repeat_sheet.cell(output_row, 4).value = record_no
+            repeat_sheet.cell(output_row, 5).value = "left"
     
             repeat_sheet.cell(
                 output_row, 6
