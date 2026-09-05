@@ -226,6 +226,7 @@ if st.button("📄 Generate Estimate", type="primary"):
                     repeat_records,
                     start_row=next_row
                 )
+                estimator.setup_ltcb_formulas()
 
                 st.write("Repeat records found:")
         
