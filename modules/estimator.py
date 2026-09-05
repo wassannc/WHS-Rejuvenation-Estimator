@@ -434,6 +434,165 @@ class EstimateGenerator:
 
     
         return output_row
+
+    def populate_ltcb_repeat(self, repeat_records, start_row=2):
+        """
+        Write LTCB repeat records into Repeat Details.
+    
+        Leak 1 -> Right canal -> E52
+        Leak 2 -> Left canal  -> E53
+    
+        Length is taken from ODK and written to Repeat Details H.
+        Sheet-T totals are formula-based so manual additions
+        in Repeat Details are also included.
+        """
+    
+        repeat_sheet = self.workbook["Repeat Details"]
+        target_sheet = self.workbook["Input Data Sheet-T"]
+    
+        ltcb_filename = "2.Rejuvenation_works-ltcb_.csv"
+    
+        if ltcb_filename not in repeat_records:
+            return start_row
+    
+        ltcb_df = repeat_records[ltcb_filename]
+    
+        output_row = start_row
+    
+        for record_no, (_, record) in enumerate(
+            ltcb_df.iterrows(), start=1
+        ):
+    
+            # -------------------------------------------------
+            # RIGHT CANAL - Leak 1
+            # -------------------------------------------------
+    
+            leak1 = record.get(
+                "ltcb_-canal_damaged_length_leak1",
+                ""
+            )
+    
+            repeat_sheet.cell(output_row, 2).value = "LTCB"
+            repeat_sheet.cell(
+                output_row, 3
+            ).value = "New bed over the existing bed"
+            repeat_sheet.cell(output_row, 4).value = record_no
+            repeat_sheet.cell(output_row, 5).value = "right"
+    
+            repeat_sheet.cell(
+                output_row, 6
+            ).value = record.get(
+                "ltcb_-leak1_ltcb_chinage_from",
+                ""
+            )
+    
+            repeat_sheet.cell(
+                output_row, 7
+            ).value = record.get(
+                "ltcb_-leak1_ltcb_chinage_to",
+                ""
+            )
+    
+            repeat_sheet.cell(
+                output_row, 8
+            ).value = leak1
+    
+            output_row += 1
+    
+            # -------------------------------------------------
+            # LEFT CANAL - Leak 2
+            # -------------------------------------------------
+    
+            leak2 = record.get(
+                "ltcb_-canal_damaged_length_leak2",
+                ""
+            )
+    
+            repeat_sheet.cell(output_row, 2).value = "LTCB"
+            repeat_sheet.cell(
+                output_row, 3
+            ).value = "New bed over the existing bed"
+            repeat_sheet.cell(output_row, 4).value = record_no
+            repeat_sheet.cell(output_row, 5).value = "left"
+    
+            repeat_sheet.cell(
+                output_row, 6
+            ).value = record.get(
+                "ltcb_-leak1_ltcb_chinage_from",
+                ""
+            )
+    
+            repeat_sheet.cell(
+                output_row, 7
+            ).value = record.get(
+                "ltcb_-leak1_ltcb_chinage_to",
+                ""
+            )
+    
+            repeat_sheet.cell(
+                output_row, 8
+            ).value = leak2
+    
+            output_row += 1
+    
+        # -------------------------------------------------
+        # Sheet-T formulas
+        # These include future manual Repeat Details entries
+        # -------------------------------------------------
+    
+        target_sheet["E52"] = (
+            '=SUMIFS('
+            "'Repeat Details'!$H$2:$H$500,"
+            "'Repeat Details'!$B$2:$B$500,\"LTCB\","
+            "'Repeat Details'!$E$2:$E$500,\"right\""
+            ')'
+        )
+    
+        target_sheet["E53"] = (
+            '=SUMIFS('
+            "'Repeat Details'!$H$2:$H$500,"
+            "'Repeat Details'!$B$2:$B$500,\"LTCB\","
+            "'Repeat Details'!$E$2:$E$500,\"left\""
+            ')'
+        )
+    
+        # -------------------------------------------------
+        # First chainage for each side
+        # -------------------------------------------------
+    
+        target_sheet["C52"] = (
+            '=IFERROR(INDEX(\'Repeat Details\'!$F$2:$F$500,'
+            'MATCH(1,'
+            '(\'Repeat Details\'!$B$2:$B$500="LTCB")*'
+            '(LOWER(\'Repeat Details\'!$E$2:$E$500)="right"),'
+            '0)),"")'
+        )
+    
+        target_sheet["D52"] = (
+            '=IFERROR(INDEX(\'Repeat Details\'!$G$2:$G$500,'
+            'MATCH(1,'
+            '(\'Repeat Details\'!$B$2:$B$500="LTCB")*'
+            '(LOWER(\'Repeat Details\'!$E$2:$E$500)="right"),'
+            '0)),"")'
+        )
+    
+        target_sheet["C53"] = (
+            '=IFERROR(INDEX(\'Repeat Details\'!$F$2:$F$500,'
+            'MATCH(1,'
+            '(\'Repeat Details\'!$B$2:$B$500="LTCB")*'
+            '(LOWER(\'Repeat Details\'!$E$2:$E$500)="left"),'
+            '0)),"")'
+        )
+    
+        target_sheet["D53"] = (
+            '=IFERROR(INDEX(\'Repeat Details\'!$G$2:$G$500,'
+            'MATCH(1,'
+            '(\'Repeat Details\'!$B$2:$B$500="LTCB")*'
+            '(LOWER(\'Repeat Details\'!$E$2:$E$500)="left"),'
+            '0)),"")'
+        )
+    
+        return output_row
     def setup_gwbjl_formulas(self):
         """
         Consolidate GWBJL chainages from Repeat Details
