@@ -215,6 +215,10 @@ if st.button("📄 Generate Estimate", type="primary"):
                     repeat_records,
                     start_row=next_row
                 )
+                next_row = estimator.populate_gwbjl_repeat(
+                    repeat_records,
+                    start_row=next_row
+                )
                 estimator.setup_gwr_formulas()
                 estimator.setup_cghi_formulas()
         
