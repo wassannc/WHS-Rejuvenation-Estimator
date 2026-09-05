@@ -795,17 +795,17 @@ class EstimateGenerator:
         # Left  = row 51
         # -------------------------------------------------
     
-        target_sheet["C50"] = "='Repeat Details'!J500"
-        target_sheet["D50"] = "='Repeat Details'!K500"
+        target_sheet["C50"] = "='Repeat Details'!O500
+        target_sheet["D50"] = "='Repeat Details'!P500
     
-        target_sheet["C51"] = "='Repeat Details'!L500"
-        target_sheet["D51"] = "='Repeat Details'!M500"
+        target_sheet["C51"] = "='Repeat Details'!Q500
+        target_sheet["D51"] = "='Repeat Details'!R500
     
         # -------------------------------------------------
         # Hide helper columns
         # -------------------------------------------------
     
-        for column in ["J", "K", "L", "M"]:
+        for column in ["O", "P", "Q", "R"]:
             repeat_sheet.column_dimensions[column].hidden = True
     
     def setup_gwr_formulas(self):
