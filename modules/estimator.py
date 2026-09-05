@@ -413,19 +413,8 @@ class EstimateGenerator:
         # ---------------------------------------------
         
         # Right canal - Row 50
-        target_sheet["C50"] = (
-            '=TEXTJOIN("; ",TRUE,'
-            'IF((\'Repeat Details\'!$B$2:$B$500="GWBJL")*'
-            '(LOWER(\'Repeat Details\'!$E$2:$E$500)="right"),'
-            '\'Repeat Details\'!$F$2:$F$500,""))'
-        )
-        
-        target_sheet["D50"] = (
-            '=TEXTJOIN("; ",TRUE,'
-            'IF((\'Repeat Details\'!$B$2:$B$500="GWBJL")*'
-            '(LOWER(\'Repeat Details\'!$E$2:$E$500)="right"),'
-            '\'Repeat Details\'!$G$2:$G$500,""))'
-        )
+        target_sheet["C50"] = "='Repeat Details'!J500"
+        target_sheet["D50"] = "='Repeat Details'!K500"
         
         target_sheet["E50"] = (
             '=SUMIFS(\'Repeat Details\'!$H$2:$H$500,'
@@ -434,19 +423,8 @@ class EstimateGenerator:
         )
                             
         # Left canal - Row 51
-        target_sheet["C51"] = (
-            '=TEXTJOIN("; ",TRUE,'
-            'IF((\'Repeat Details\'!$B$2:$B$500="GWBJL")*'
-            '(LOWER(\'Repeat Details\'!$E$2:$E$500)="left"),'
-            '\'Repeat Details\'!$F$2:$F$500,""))'
-        )
-        
-        target_sheet["D51"] = (
-            '=TEXTJOIN("; ",TRUE,'
-            'IF((\'Repeat Details\'!$B$2:$B$500="GWBJL")*'
-            '(LOWER(\'Repeat Details\'!$E$2:$E$500)="left"),'
-            '\'Repeat Details\'!$G$2:$G$500,""))'
-        )
+        target_sheet["C51"] = "='Repeat Details'!L500"
+        target_sheet["D51"] = "='Repeat Details'!M500"
         
         target_sheet["E51"] = (
             '=SUMIFS(\'Repeat Details\'!$H$2:$H$500,'
