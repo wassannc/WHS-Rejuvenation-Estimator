@@ -222,7 +222,11 @@ if st.button("📄 Generate Estimate", type="primary"):
                 estimator.setup_gwr_formulas()
                 estimator.setup_cghi_formulas()
                 estimator.setup_gwbjl_formulas()
-        
+                next_row = estimator.populate_ltcb_repeat(
+                    repeat_records,
+                    start_row=next_row
+                )
+
                 st.write("Repeat records found:")
         
                 for filename, repeat_df in repeat_records.items():
