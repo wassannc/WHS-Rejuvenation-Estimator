@@ -456,6 +456,109 @@ class EstimateGenerator:
 
     
         return output_row
+    def setup_gwbjl_formulas(self):
+        """
+        Consolidate GWBJL chainages from Repeat Details
+        into Input Data Sheet-T.
+    
+        Supports both ODK and manually added records.
+        """
+    
+        repeat_sheet = self.workbook["Repeat Details"]
+        target_sheet = self.workbook["Input Data Sheet-T"]
+    
+        # -------------------------------------------------
+        # Helper columns
+        # J = Right Chainage From
+        # K = Right Chainage To
+        # L = Left Chainage From
+        # M = Left Chainage To
+        # -------------------------------------------------
+    
+        for row in range(2, 501):
+    
+            if row == 2:
+    
+                repeat_sheet.cell(row, 10).value = (
+                    f'=IF(AND($B{row}="GWBJL",'
+                    f'LOWER($E{row})="right"),'
+                    f'TEXT($F{row},"0.0"),"")'
+                )
+    
+                repeat_sheet.cell(row, 11).value = (
+                    f'=IF(AND($B{row}="GWBJL",'
+                    f'LOWER($E{row})="right"),'
+                    f'TEXT($G{row},"0.0"),"")'
+                )
+    
+                repeat_sheet.cell(row, 12).value = (
+                    f'=IF(AND($B{row}="GWBJL",'
+                    f'LOWER($E{row})="left"),'
+                    f'TEXT($F{row},"0.0"),"")'
+                )
+    
+                repeat_sheet.cell(row, 13).value = (
+                    f'=IF(AND($B{row}="GWBJL",'
+                    f'LOWER($E{row})="left"),'
+                    f'TEXT($G{row},"0.0"),"")'
+                )
+    
+            else:
+    
+                # RIGHT - Chainage From
+                repeat_sheet.cell(row, 10).value = (
+                    f'=IF(AND($B{row}="GWBJL",'
+                    f'LOWER($E{row})="right"),'
+                    f'IF(J{row-1}="",TEXT($F{row},"0.0"),'
+                    f'J{row-1}&"; "&TEXT($F{row},"0.0")),'
+                    f'J{row-1})'
+                )
+    
+                # RIGHT - Chainage To
+                repeat_sheet.cell(row, 11).value = (
+                    f'=IF(AND($B{row}="GWBJL",'
+                    f'LOWER($E{row})="right"),'
+                    f'IF(K{row-1}="",TEXT($G{row},"0.0"),'
+                    f'K{row-1}&"; "&TEXT($G{row},"0.0")),'
+                    f'K{row-1})'
+                )
+    
+                # LEFT - Chainage From
+                repeat_sheet.cell(row, 12).value = (
+                    f'=IF(AND($B{row}="GWBJL",'
+                    f'LOWER($E{row})="left"),'
+                    f'IF(L{row-1}="",TEXT($F{row},"0.0"),'
+                    f'L{row-1}&"; "&TEXT($F{row},"0.0")),'
+                    f'L{row-1})'
+                )
+    
+                # LEFT - Chainage To
+                repeat_sheet.cell(row, 13).value = (
+                    f'=IF(AND($B{row}="GWBJL",'
+                    f'LOWER($E{row})="left"),'
+                    f'IF(M{row-1}="",TEXT($G{row},"0.0"),'
+                    f'M{row-1}&"; "&TEXT($G{row},"0.0")),'
+                    f'M{row-1})'
+                )
+    
+        # -------------------------------------------------
+        # Sheet-T
+        # Right = row 50
+        # Left  = row 51
+        # -------------------------------------------------
+    
+        target_sheet["C50"] = "='Repeat Details'!J500"
+        target_sheet["D50"] = "='Repeat Details'!K500"
+    
+        target_sheet["C51"] = "='Repeat Details'!L500"
+        target_sheet["D51"] = "='Repeat Details'!M500"
+    
+        # -------------------------------------------------
+        # Hide helper columns
+        # -------------------------------------------------
+    
+        for column in ["J", "K", "L", "M"]:
+            repeat_sheet.column_dimensions[column].hidden = True
     
     def setup_gwr_formulas(self):
         """
