@@ -283,6 +283,7 @@ class EstimateGenerator:
             output_row += 1
     
         return output_row
+        
     def populate_gwbjl_repeat(self, repeat_records, start_row=2):
         """
         Write GWBJL repeat records into Repeat Details
@@ -321,6 +322,7 @@ class EstimateGenerator:
             ).value = "Hunch through bed and guidewall joint"
     
             repeat_sheet.cell(output_row, 4).value = record_no
+            repeat_sheet.cell(output_row, 5).value = "right"
     
             # ---------------------------------------------
             # Chainage
@@ -380,8 +382,6 @@ class EstimateGenerator:
                 output_row, 3
             ).value = "Hunch through bed and guidewall joint"
     
-            repeat_sheet.cell(output_row, 4).value = record_no
-            repeat_sheet.cell(output_row, 5).value = "right"
             repeat_sheet.cell(output_row, 4).value = record_no
             repeat_sheet.cell(output_row, 5).value = "left"
     
