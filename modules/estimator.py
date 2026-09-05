@@ -599,6 +599,111 @@ class EstimateGenerator:
         )
     
         return output_row
+        
+    def setup_ltcb_formulas(self):
+        """
+        Consolidate LTCB chainages into Input Data Sheet-T.
+    
+        Right side -> Row 52
+        Left side  -> Row 53
+    
+        Supports multiple chainages and manual entries
+        added to Repeat Details.
+        """
+    
+        repeat_sheet = self.workbook["Repeat Details"]
+        target_sheet = self.workbook["Input Data Sheet-T"]
+    
+        # -------------------------------------------------
+        # Helper columns
+        # J = Right From
+        # K = Right To
+        # M = Left From
+        # N = Left To
+        # -------------------------------------------------
+    
+        for row in range(2, 501):
+    
+            if row == 2:
+    
+                repeat_sheet.cell(row, 10).value = (
+                    f'=IF(AND($B{row}="LTCB",'
+                    f'LOWER($E{row})="right"),'
+                    f'TEXT($F{row},"0.0"),"")'
+                )
+    
+                repeat_sheet.cell(row, 11).value = (
+                    f'=IF(AND($B{row}="LTCB",'
+                    f'LOWER($E{row})="right"),'
+                    f'TEXT($G{row},"0.0"),"")'
+                )
+    
+                repeat_sheet.cell(row, 13).value = (
+                    f'=IF(AND($B{row}="LTCB",'
+                    f'LOWER($E{row})="left"),'
+                    f'TEXT($F{row},"0.0"),"")'
+                )
+    
+                repeat_sheet.cell(row, 14).value = (
+                    f'=IF(AND($B{row}="LTCB",'
+                    f'LOWER($E{row})="left"),'
+                    f'TEXT($G{row},"0.0"),"")'
+                )
+    
+            else:
+    
+                # RIGHT - Chainage From
+                repeat_sheet.cell(row, 10).value = (
+                    f'=IF(AND($B{row}="LTCB",'
+                    f'LOWER($E{row})="right"),'
+                    f'IF(J{row-1}="",TEXT($F{row},"0.0"),'
+                    f'J{row-1}&", "&TEXT($F{row},"0.0")),'
+                    f'J{row-1})'
+                )
+    
+                # RIGHT - Chainage To
+                repeat_sheet.cell(row, 11).value = (
+                    f'=IF(AND($B{row}="LTCB",'
+                    f'LOWER($E{row})="right"),'
+                    f'IF(K{row-1}="",TEXT($G{row},"0.0"),'
+                    f'K{row-1}&", "&TEXT($G{row},"0.0")),'
+                    f'K{row-1})'
+                )
+    
+                # LEFT - Chainage From
+                repeat_sheet.cell(row, 13).value = (
+                    f'=IF(AND($B{row}="LTCB",'
+                    f'LOWER($E{row})="left"),'
+                    f'IF(M{row-1}="",TEXT($F{row},"0.0"),'
+                    f'M{row-1}&", "&TEXT($F{row},"0.0")),'
+                    f'M{row-1})'
+                )
+    
+                # LEFT - Chainage To
+                repeat_sheet.cell(row, 14).value = (
+                    f'=IF(AND($B{row}="LTCB",'
+                    f'LOWER($E{row})="left"),'
+                    f'IF(N{row-1}="",TEXT($G{row},"0.0"),'
+                    f'N{row-1}&", "&TEXT($G{row},"0.0")),'
+                    f'N{row-1})'
+                )
+    
+        # -------------------------------------------------
+        # Sheet-T
+        # -------------------------------------------------
+    
+        target_sheet["C52"] = "='Repeat Details'!J500"
+        target_sheet["D52"] = "='Repeat Details'!K500"
+    
+        target_sheet["C53"] = "='Repeat Details'!M500"
+        target_sheet["D53"] = "='Repeat Details'!N500"
+    
+        # -------------------------------------------------
+        # Hide helper columns
+        # -------------------------------------------------
+    
+        for column in ["J", "K", "M", "N"]:
+            repeat_sheet.column_dimensions[column].hidden = True
     def setup_gwbjl_formulas(self):
         """
         Consolidate GWBJL chainages from Repeat Details
