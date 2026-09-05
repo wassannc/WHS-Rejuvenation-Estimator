@@ -355,9 +355,10 @@ class EstimateGenerator:
     
             leak1_total += leak1_value
     
+            leak1_total += leak1_value
             repeat_sheet.cell(
                 output_row, 8
-            ).value = leak1
+            ).value = leak1_value
     
             output_row += 1
     
@@ -397,9 +398,10 @@ class EstimateGenerator:
                 "leak1_gwbjl_chinage_to", ""
             )
     
+            leak2_total += leak2_value
             repeat_sheet.cell(
                 output_row, 8
-            ).value = leak2
+            ).value = leak2_value
     
             output_row += 1
     
@@ -424,7 +426,7 @@ class EstimateGenerator:
             '\'Repeat Details\'!$B$2:$B$500,"GWBJL",'
             '\'Repeat Details\'!$E$2:$E$500,"right")'
         )
-        
+                            
         # Left canal - Row 51
         target_sheet["C51"] = (
             '=IFERROR(INDEX(\'Repeat Details\'!$F$2:$F$500,'
@@ -441,6 +443,7 @@ class EstimateGenerator:
             '\'Repeat Details\'!$B$2:$B$500,"GWBJL",'
             '\'Repeat Details\'!$E$2:$E$500,"left")'
         )
+
     
         return output_row
     
