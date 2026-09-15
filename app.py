@@ -114,12 +114,6 @@ if st.button("📄 Generate Estimate", type="primary"):
         odk = ODKCentral()
 
         repairs = odk.get_repairs()
-        st.write("### 🔎 ODK ZIP Export Test")
-
-        export_files = odk.get_form_export_files(REPAIR_FORM_ID)
-        
-        st.write("Files returned by ODK Central:")
-        st.write(export_files)
         
         lead = odk.get_lead()
 
