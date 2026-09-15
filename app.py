@@ -221,20 +221,6 @@ if st.button("📄 Generate Estimate", type="primary"):
                     start_row=next_row
                 )
                 estimator.setup_ltcb_formulas()
-
-                st.write("Repeat records found:")
-        
-                for filename, repeat_df in repeat_records.items():
-                    st.write(
-                        f"**{filename}** → {len(repeat_df)} record(s)"
-                    )
-                    if "ncg" in filename:
-                        st.write("NCG columns:")
-                        st.write(list(repeat_df.columns))
-                        st.write("NCG records:")
-                        st.dataframe(repeat_df)
-            else:
-                st.warning("Selected repair has no KEY.")
         
             # -----------------------------------------
             # Existing repair population
