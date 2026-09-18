@@ -844,135 +844,188 @@ class EstimateGenerator:
     
     def setup_gwr_formulas(self):
         """
-        Create Excel 2019+ compatible formulas that consolidate
-        GWR records from Repeat Details into Input Data Sheet-T.
+        Consolidate GWR records from Repeat Details
+        separately for Right and Left sides.
+    
+        J = Right From
+        K = Right To
+        L = Right Length
+    
+        M = Left From
+        N = Left To
+        O = Left Length
         """
-
+    
         repeat_sheet = self.workbook["Repeat Details"]
         target_sheet = self.workbook["Input Data Sheet-T"]
-
+    
         # -------------------------------------------------
-        # Helper columns
-        # J = Right From
-        # K = Right To
-        # L = Right Length
-        # M = Left From
-        # N = Left To
-        # O = Left Length
+        # Find the actual last populated Repeat Details row
         # -------------------------------------------------
-
+    
+        last_row = repeat_sheet.max_row
+    
+        # -------------------------------------------------
+        # RIGHT SIDE
+        # -------------------------------------------------
+    
+        right_rows = []
+    
+        for row in range(2, last_row + 1):
+    
+            group = repeat_sheet.cell(row, 2).value
+            side = repeat_sheet.cell(row, 5).value
+    
+            if (
+                str(group).strip().upper() == "GWR"
+                and str(side).strip().lower() == "right"
+            ):
+                right_rows.append(row)
+    
+        # -------------------------------------------------
+        # LEFT SIDE
+        # -------------------------------------------------
+    
+        left_rows = []
+    
+        for row in range(2, last_row + 1):
+    
+            group = repeat_sheet.cell(row, 2).value
+            side = repeat_sheet.cell(row, 5).value
+    
+            if (
+                str(group).strip().upper() == "GWR"
+                and str(side).strip().lower() == "left"
+            ):
+                left_rows.append(row)
+    
+        # -------------------------------------------------
+        # Clear old helper formulas
+        # -------------------------------------------------
+    
         for row in range(2, 501):
-
-            if row == 2:
-                # First GWR record
-
-                repeat_sheet.cell(row, 10).value = (
-                    f'=IF(AND($B{row}="GWR",LOWER($E{row})="right"),'
-                    f'$F{row},"")'
+    
+            for col in range(10, 16):
+                repeat_sheet.cell(row, col).value = None
+    
+        # -------------------------------------------------
+        # Create RIGHT-side values
+        # -------------------------------------------------
+    
+        if right_rows:
+    
+            right_from_parts = []
+            right_to_parts = []
+            right_length_parts = []
+    
+            for row in right_rows:
+    
+                right_from_parts.append(
+                    f'TEXT(F{row},"0.0")'
                 )
-
-                repeat_sheet.cell(row, 11).value = (
-                    f'=IF(AND($B{row}="GWR",LOWER($E{row})="right"),'
-                    f'$G{row},"")'
+    
+                right_to_parts.append(
+                    f'TEXT(G{row},"0.0")'
                 )
-
-                repeat_sheet.cell(row, 12).value = (
-                    f'=IF(AND($B{row}="GWR",LOWER($E{row})="right"),'
-                    f'$H{row},0)'
+    
+                right_length_parts.append(
+                    f'H{row}'
                 )
-
-                repeat_sheet.cell(row, 13).value = (
-                    f'=IF(AND($B{row}="GWR",LOWER($E{row})="left"),'
-                    f'$F{row},"")'
+    
+            # J = Right From
+            repeat_sheet["J500"] = (
+                "=" +
+                "&\"; \"&".join(right_from_parts)
+            )
+    
+            # K = Right To
+            repeat_sheet["K500"] = (
+                "=" +
+                "&\"; \"&".join(right_to_parts)
+            )
+    
+            # L = Right Length
+            repeat_sheet["L500"] = (
+                "=" +
+                "+".join(right_length_parts)
+            )
+    
+        else:
+    
+            repeat_sheet["J500"] = '=""'
+            repeat_sheet["K500"] = '=""'
+            repeat_sheet["L500"] = "=0"
+    
+        # -------------------------------------------------
+        # Create LEFT-side values
+        # -------------------------------------------------
+    
+        if left_rows:
+    
+            left_from_parts = []
+            left_to_parts = []
+            left_length_parts = []
+    
+            for row in left_rows:
+    
+                left_from_parts.append(
+                    f'TEXT(F{row},"0.0")'
                 )
-
-                repeat_sheet.cell(row, 14).value = (
-                    f'=IF(AND($B{row}="GWR",LOWER($E{row})="left"),'
-                    f'$G{row},"")'
+    
+                left_to_parts.append(
+                    f'TEXT(G{row},"0.0")'
                 )
-
-                repeat_sheet.cell(row, 15).value = (
-                    f'=IF(AND($B{row}="GWR",LOWER($E{row})="left"),'
-                    f'$H{row},0)'
+    
+                left_length_parts.append(
+                    f'H{row}'
                 )
-
-            else:
-                # Keep the previous total when the row belongs
-                # to the opposite side, and add when it matches.
-
-                # RIGHT - Chainage From
-                repeat_sheet.cell(row, 10).value = (
-                    f'=IF(AND($B{row}="GWR",'
-                    f'LOWER($E{row})="right"),'
-                    f'IF(J{row-1}="",TEXT($F{row},"0.0"),'
-                    f'J{row-1}&"; "&TEXT($F{row},"0.0")),'
-                    f'J{row-1})'
-                )
-
-                # RIGHT - Chainage To
-                repeat_sheet.cell(row, 11).value = (
-                    f'=IF(AND($B{row}="GWR",'
-                    f'LOWER($E{row})="right"),'
-                    f'IF(K{row-1}="",TEXT($G{row},"0.0"),'
-                    f'K{row-1}&"; "&TEXT($G{row},"0.0")),'
-                    f'K{row-1})'
-                )
-
-                # RIGHT - Length
-                repeat_sheet.cell(row, 12).value = (
-                    f'=IF(AND($B{row}="GWR",'
-                    f'LOWER($E{row})="right"),'
-                    f'L{row-1}+$H{row},'
-                    f'L{row-1})'
-                )
-
-                # LEFT - Chainage From
-                repeat_sheet.cell(row, 13).value = (
-                    f'=IF(AND($B{row}="GWR",'
-                    f'LOWER($E{row})="left"),'
-                    f'IF(M{row-1}="",TEXT($F{row},"0.0"),'
-                    f'M{row-1}&"; "&TEXT($F{row},"0.0")),'
-                    f'M{row-1})'
-                )
-
-                # LEFT - Chainage To
-                repeat_sheet.cell(row, 14).value = (
-                    f'=IF(AND($B{row}="GWR",'
-                    f'LOWER($E{row})="left"),'
-                    f'IF(N{row-1}="",TEXT($G{row},"0.0"),'
-                    f'N{row-1}&"; "&TEXT($G{row},"0.0")),'
-                    f'N{row-1})'
-                )
-
-                # LEFT - Length
-                repeat_sheet.cell(row, 15).value = (
-                    f'=IF(AND($B{row}="GWR",'
-                    f'LOWER($E{row})="left"),'
-                    f'O{row-1}+$H{row},'
-                    f'O{row-1})'
-                ) 
-                
-                # -------------------------------------------------
-                # SEND GWR CHAINAGES TO INPUT DATA SHEET-T
-                # Length E40/E41 is already populated from ODK mapping
-                # -------------------------------------------------
-                
-                # GWR Right → Row 40
-                target_sheet["C40"] = "='Repeat Details'!J500"
-                target_sheet["D40"] = "='Repeat Details'!K500"
-                target_sheet["E40"] = "='Repeat Details'!L500"
-                
-                # GWR Left → Row 41
-                target_sheet["C41"] = "='Repeat Details'!M500"
-                target_sheet["D41"] = "='Repeat Details'!N500"
-                target_sheet["E41"] = "='Repeat Details'!O500"
-        
-                # -------------------------------------------------
-                # Hide GWR helper columns
-                # -------------------------------------------------
-        
-                for column in ["J", "K", "L", "M", "N", "O"]:
-                    repeat_sheet.column_dimensions[column].hidden = True
+    
+            # M = Left From
+            repeat_sheet["M500"] = (
+                "=" +
+                "&\"; \"&".join(left_from_parts)
+            )
+    
+            # N = Left To
+            repeat_sheet["N500"] = (
+                "=" +
+                "&\"; \"&".join(left_to_parts)
+            )
+    
+            # O = Left Length
+            repeat_sheet["O500"] = (
+                "=" +
+                "+".join(left_length_parts)
+            )
+    
+        else:
+    
+            repeat_sheet["M500"] = '=""'
+            repeat_sheet["N500"] = '=""'
+            repeat_sheet["O500"] = "=0"
+    
+        # -------------------------------------------------
+        # Send values to Input Data Sheet-T
+        # -------------------------------------------------
+    
+        # GWR RIGHT → Row 40
+    
+        target_sheet["C40"] = "='Repeat Details'!J500"
+        target_sheet["D40"] = "='Repeat Details'!K500"
+        target_sheet["E40"] = "='Repeat Details'!L500"
+    
+        # GWR LEFT → Row 41
+    
+        target_sheet["C41"] = "='Repeat Details'!M500"
+        target_sheet["D41"] = "='Repeat Details'!N500"
+        target_sheet["E41"] = "='Repeat Details'!O500"
+    
+        # -------------------------------------------------
+        # Hide helper columns
+        # -------------------------------------------------
+    
+        for column in ["J", "K", "L", "M", "N", "O"]:
+            repeat_sheet.column_dimensions[column].hidden = True
     def setup_cghi_formulas(self):
         """
         Consolidate CGHI records from Repeat Details
