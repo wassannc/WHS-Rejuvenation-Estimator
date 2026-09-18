@@ -24,68 +24,62 @@ basic = load_basic_data()
 st.success(f"{len(basic)} structures loaded")
 
 # ---------------------------------------
-# District
+# Cascading Filters
 # ---------------------------------------
 
-districts = sorted(
-    basic["geo-district"].dropna().unique()
-)
+col1, col2, col3, col4 = st.columns(4)
 
-district = st.selectbox(
-    "District",
-    districts
-)
+with col1:
+    districts = sorted(
+        basic["geo-district"].dropna().unique()
+    )
 
-# ---------------------------------------
-# Block
-# ---------------------------------------
+    district = st.selectbox(
+        "District",
+        districts
+    )
 
-block_df = basic[
-    basic["geo-district"] == district
-]
+with col2:
+    block_df = basic[
+        basic["geo-district"] == district
+    ]
 
-blocks = sorted(
-    block_df["geo-block"].dropna().unique()
-)
+    blocks = sorted(
+        block_df["geo-block"].dropna().unique()
+    )
 
-block = st.selectbox(
-    "Block",
-    blocks
-)
+    block = st.selectbox(
+        "Block",
+        blocks
+    )
 
-# ---------------------------------------
-# GP
-# ---------------------------------------
+with col3:
+    gp_df = block_df[
+        block_df["geo-block"] == block
+    ]
 
-gp_df = block_df[
-    block_df["geo-block"] == block
-]
+    gps = sorted(
+        gp_df["geo-gp"].dropna().unique()
+    )
 
-gps = sorted(
-    gp_df["geo-gp"].dropna().unique()
-)
+    gp = st.selectbox(
+        "Gram Panchayat",
+        gps
+    )
 
-gp = st.selectbox(
-    "Gram Panchayat",
-    gps
-)
+with col4:
+    village_df = gp_df[
+        gp_df["geo-gp"] == gp
+    ]
 
-# ---------------------------------------
-# Village
-# ---------------------------------------
+    villages = sorted(
+        village_df["geo-village"].dropna().unique()
+    )
 
-village_df = gp_df[
-    gp_df["geo-gp"] == gp
-]
-
-villages = sorted(
-    village_df["geo-village"].dropna().unique()
-)
-
-village = st.selectbox(
-    "Village",
-    villages
-)
+    village = st.selectbox(
+        "Village",
+        villages
+    )
 st.divider()
 
 st.subheader("📋 Structure Information")
