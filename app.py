@@ -94,50 +94,18 @@ structure = village_df[
     village_df["geo-village"] == village
 ].iloc[0]
 
-col1, col2, col3, col4 = st.columns(4)
+col1, col2 = st.columns(2)
 
 with col1:
-    district = st.selectbox(
-        "District",
-        sorted(df["district"].dropna().unique())
-    )
+    st.write(f"**District:** {district}")
+    st.write(f"**Block:** {block}")
+    st.write(f"**GP:** {gp}")
+    st.write(f"**Village:** {village}")
 
 with col2:
-    block = st.selectbox(
-        "Block",
-        sorted(
-            df[df["district"] == district]["block"]
-            .dropna()
-            .unique()
-        )
-    )
-
-with col3:
-    gp = st.selectbox(
-        "Gram Panchayat",
-        sorted(
-            df[
-                (df["district"] == district) &
-                (df["block"] == block)
-            ]["gp"]
-            .dropna()
-            .unique()
-        )
-    )
-
-with col4:
-    village = st.selectbox(
-        "Village",
-        sorted(
-            df[
-                (df["district"] == district) &
-                (df["block"] == block) &
-                (df["gp"] == gp)
-            ]["village"]
-            .dropna()
-            .unique()
-        )
-    )
+    st.write(f"**Latitude:** {structure['geo-village_gps-Latitude']}")
+    st.write(f"**Longitude:** {structure['geo-village_gps-Longitude']}")
+    st.write(f"**Altitude:** {structure['geo-village_gps-Altitude']}")
 
 if st.button("📄 Generate Estimate", type="primary"):
 
