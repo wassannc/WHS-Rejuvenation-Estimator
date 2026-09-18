@@ -950,28 +950,27 @@ class EstimateGenerator:
                     f'LOWER($E{row})="left"),'
                     f'O{row-1}+$H{row},'
                     f'O{row-1})'
-                )
-        # -------------------------------------------------        
-        # Sheet-T
-        # GWR Right = row 40
-        # GWR Left  = row 41
-        # -------------------------------------------------
-
-        target_sheet["C40"] = "='Repeat Details'!J500"
-        target_sheet["D40"] = "='Repeat Details'!K500"
-        target_sheet["E40"] = "='Repeat Details'!L500"
-
-        target_sheet["C41"] = "='Repeat Details'!M500"
-        target_sheet["D41"] = "='Repeat Details'!N500"
-        target_sheet["E41"] = "='Repeat Details'!O500"
-
-        # -------------------------------------------------
-        # Hide helper columns
-        # -------------------------------------------------
-
-        for column in ["J", "K", "L", "M", "N", "O"]:
-            repeat_sheet.column_dimensions[column].hidden = True
-    
+                ) 
+                # -------------------------------------------------
+                # SEND FINAL GWR VALUES TO INPUT DATA SHEET-T
+                # -------------------------------------------------
+        
+                # GWR Right → Row 40
+                target_sheet["C40"] = "='Repeat Details'!J500"
+                target_sheet["D40"] = "='Repeat Details'!K500"
+                target_sheet["E40"] = "='Repeat Details'!L500"
+        
+                # GWR Left → Row 41
+                target_sheet["C41"] = "='Repeat Details'!M500"
+                target_sheet["D41"] = "='Repeat Details'!N500"
+                target_sheet["E41"] = "='Repeat Details'!O500"
+        
+                # -------------------------------------------------
+                # Hide GWR helper columns
+                # -------------------------------------------------
+        
+                for column in ["J", "K", "L", "M", "N", "O"]:
+                    repeat_sheet.column_dimensions[column].hidden = True
     def setup_cghi_formulas(self):
         """
         Consolidate CGHI records from Repeat Details
