@@ -960,10 +960,12 @@ class EstimateGenerator:
                 # GWR Right → Row 40
                 target_sheet["C40"] = "='Repeat Details'!J500"
                 target_sheet["D40"] = "='Repeat Details'!K500"
+                target_sheet["E40"] = "='Repeat Details'!L500"
                 
                 # GWR Left → Row 41
                 target_sheet["C41"] = "='Repeat Details'!M500"
                 target_sheet["D41"] = "='Repeat Details'!N500"
+                target_sheet["E41"] = "='Repeat Details'!O500"
         
                 # -------------------------------------------------
                 # Hide GWR helper columns
