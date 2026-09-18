@@ -271,70 +271,90 @@ if st.button("📄 Generate Estimate", type="primary"):
                 # Populate GWR Repeat
                 # ---------------------------------------
 
-                next_row = (
-                    estimator.populate_gwr_repeat(
+                # -----------------------------------------
+                # TEST REPEAT RECORDS
+                # -----------------------------------------
+                parent_key = repair_record.get("KEY", "")
+                
+                st.write("### 🔗 Repeat Record Test")
+                st.write("Selected Repair KEY:", parent_key)
+                
+                if parent_key:
+                
+                    repeat_records = odk.get_repeat_records(
+                        REPAIR_FORM_ID,
+                        parent_key
+                    )
+                
+                    # Show actual GWR column names
+                    if "2.Rejuvenation_works-gwr_.csv" in repeat_records:
+                
+                        st.write(
+                            "GWR columns:",
+                            list(
+                                repeat_records[
+                                    "2.Rejuvenation_works-gwr_.csv"
+                                ].columns
+                            )
+                        )
+                
+                    # -----------------------------------------
+                    # FIRST: POPULATE MAIN REPAIR DATA
+                    # -----------------------------------------
+                
+                    estimator.populate_sheet(
+                        "Input Data Sheet-T",
+                        repair_record
+                    )
+                
+                    # -----------------------------------------
+                    # SECOND: POPULATE REPEAT DETAILS
+                    # -----------------------------------------
+                
+                    next_row = estimator.populate_gwr_repeat(
                         repeat_records
                     )
-                )
-
-
-                # ---------------------------------------
-                # Populate NCG Repeat
-                # ---------------------------------------
-
-                next_row = (
-                    estimator.populate_ncg_repeat(
+                
+                    next_row = estimator.populate_ncg_repeat(
                         repeat_records,
                         start_row=next_row
                     )
-                )
-
-
-                # ---------------------------------------
-                # Populate CGHI Repeat
-                # ---------------------------------------
-
-                next_row = (
-                    estimator.populate_cghi_repeat(
+                
+                    next_row = estimator.populate_cghi_repeat(
                         repeat_records,
                         start_row=next_row
                     )
-                )
-
-
-                # ---------------------------------------
-                # Populate GWBJL Repeat
-                # ---------------------------------------
-
-                next_row = (
-                    estimator.populate_gwbjl_repeat(
+                
+                    next_row = estimator.populate_gwbjl_repeat(
                         repeat_records,
                         start_row=next_row
                     )
-                )
-
-
-                # ---------------------------------------
-                # Populate LTCB Repeat
-                # ---------------------------------------
-
-                next_row = (
-                    estimator.populate_ltcb_repeat(
+                
+                    next_row = estimator.populate_ltcb_repeat(
                         repeat_records,
                         start_row=next_row
                     )
-                )
-
-
-            # ---------------------------------------
-            # Existing Repair Population
-            # ---------------------------------------
-
-            estimator.populate_sheet(
-                "Input Data Sheet-T",
-                repair_record
-            )
-
+                
+                    # -----------------------------------------
+                    # THIRD: SETUP FORMULAS
+                    # IMPORTANT: THIS MUST BE AFTER
+                    # populate_sheet()
+                    # -----------------------------------------
+                
+                    estimator.setup_gwr_formulas()
+                
+                    estimator.setup_cghi_formulas()
+                
+                    estimator.setup_gwbjl_formulas()
+                
+                    estimator.setup_ltcb_formulas()
+                
+                
+                    st.success("✅ Repair data populated")
+                
+                else:
+                
+                    st.warning("No repair records found.")
 
             st.success(
                 "✅ Repair data populated"
