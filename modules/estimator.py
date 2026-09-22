@@ -306,9 +306,14 @@ class EstimateGenerator:
             )
     
             # Length = Chainage To - Chainage From
-            sheet.cell(output_row, 8).value = (
-                f'=IF(AND(F{output_row}<>"",G{output_row}<>""),'
-                f'G{output_row}-F{output_row},"")'
+            try:
+                chain_from_num = float(record.get("chainage_gwr_from", ""))
+                chain_to_num = float(record.get("chainage_gwr_to", ""))
+                length = chain_to_num - chain_from_num
+            except (ValueError, TypeError):
+                length = 0
+            
+            sheet.cell(output_row, 8).value = length
             )
     
             output_row += 1
