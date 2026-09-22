@@ -84,59 +84,90 @@ class EstimateGenerator:
             "C70",
             "Mamidipalli"
         )
+    
     def populate_gwr_repeat(self, repeat_records):
         """
-        Write GWR repeat records into the Repeat Details sheet.
+        Write GWR repeat records into Repeat Details.
+        Length is calculated in Python so openpyxl can read it immediately.
         """
-
+    
         sheet = self.workbook["Repeat Details"]
-
-        # Start writing from row 2
+    
         output_row = 2
-
-        # GWR CSV filename from ODK ZIP export
+    
         gwr_filename = "2.Rejuvenation_works-gwr_.csv"
-
+    
         if gwr_filename not in repeat_records:
-            return 2
-
+            return output_row
+    
         gwr_df = repeat_records[gwr_filename]
-
+    
         for record_no, (_, record) in enumerate(
             gwr_df.iterrows(), start=1
         ):
-
-            # Repeat Group
-            sheet.cell(output_row, 2).value = "GWR"
-
-            # Parameter / Work
-            sheet.cell(output_row, 3).value = "Guide Wall Repair"
-
-            # Record No
-            sheet.cell(output_row, 4).value = record_no
-
-            # Side
-            sheet.cell(output_row, 5).value = record.get(
-                "gwr_side", ""
-            )
-
-            # Chainage From
-            sheet.cell(output_row, 6).value = record.get(
+    
+            side = str(
+                record.get("gwr_side", "")
+            ).strip().lower()
+    
+            chainage_from = record.get(
                 "chainage_gwr_from", ""
             )
-
-            # Chainage To
-            sheet.cell(output_row, 7).value = record.get(
+    
+            chainage_to = record.get(
                 "chainage_gwr_to", ""
             )
-
-            # Length = Chainage To - Chainage From
-            sheet.cell(output_row, 8).value = (
-                f'=IF(AND(F{output_row}<>"",G{output_row}<>""),'
-                f'G{output_row}-F{output_row},"")'
-            )
-
+    
+            # -----------------------------------------
+            # Calculate length in Python
+            # -----------------------------------------
+    
+            try:
+                cf = float(chainage_from)
+                ct = float(chainage_to)
+    
+                length = ct - cf
+    
+            except (ValueError, TypeError):
+    
+                length = 0
+    
+            # -----------------------------------------
+            # Write Repeat Details
+            # -----------------------------------------
+    
+            sheet.cell(
+                output_row, 2
+            ).value = "GWR"
+    
+            sheet.cell(
+                output_row, 3
+            ).value = "Guide Wall Repair"
+    
+            sheet.cell(
+                output_row, 4
+            ).value = record_no
+    
+            sheet.cell(
+                output_row, 5
+            ).value = side
+    
+            sheet.cell(
+                output_row, 6
+            ).value = chainage_from
+    
+            sheet.cell(
+                output_row, 7
+            ).value = chainage_to
+    
+            # IMPORTANT:
+            # Write numeric value, NOT Excel formula
+            sheet.cell(
+                output_row, 8
+            ).value = length
+    
             output_row += 1
+    
         return output_row
     
     def populate_ncg_repeat(self, repeat_records, start_row=2):
