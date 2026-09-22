@@ -172,33 +172,26 @@ class EstimateGenerator:
     
     def populate_ncg_repeat(self, repeat_records, start_row=2):
         """
-        Write NCG repeat records into Repeat Details
-        and populate NCG totals/chainages in Input Data Sheet-T.
+        Write NCG repeat records into Repeat Details.
+    
+        Sheet-T is NOT populated directly here.
+        Sheet-T will be linked to Repeat Details separately.
         """
     
         sheet = self.workbook["Repeat Details"]
-        target_sheet = self.workbook["Input Data Sheet-T"]
+    
+        output_row = start_row
     
         ncg_filename = "2.Rejuvenation_works-ncg_.csv"
     
         if ncg_filename not in repeat_records:
-            return start_row
+            return output_row
     
         ncg_df = repeat_records[ncg_filename]
     
-        output_row = start_row
-    
-        left_lengths = []
-        right_lengths = []
-    
-        left_from = []
-        left_to = []
-    
-        right_from = []
-        right_to = []
-    
         for record_no, (_, record) in enumerate(
-            ncg_df.iterrows(), start=1
+            ncg_df.iterrows(),
+            start=1
         ):
     
             # -----------------------------------------
@@ -220,7 +213,22 @@ class EstimateGenerator:
             )
     
             # -----------------------------------------
-            # Write basic NCG information
+            # Calculate length
+            # -----------------------------------------
+    
+            try:
+    
+                cf = float(chainage_from)
+                ct = float(chainage_to)
+    
+                length = ct - cf
+    
+            except (TypeError, ValueError):
+    
+                length = 0
+    
+            # -----------------------------------------
+            # Write Repeat Details
             # -----------------------------------------
     
             sheet.cell(
@@ -247,118 +255,11 @@ class EstimateGenerator:
                 output_row, 7
             ).value = chainage_to
     
-            # -----------------------------------------
-            # Calculate NCG Length
-            # H = G - F
-            # -----------------------------------------
-    
-            try:
-    
-                if (
-                    chainage_from not in ("", None)
-                    and
-                    chainage_to not in ("", None)
-                ):
-    
-                    cf = float(chainage_from)
-                    ct = float(chainage_to)
-    
-                    length = ct - cf
-    
-                else:
-    
-                    length = 0
-    
-            except (TypeError, ValueError):
-    
-                length = 0
-    
             sheet.cell(
                 output_row, 8
             ).value = length
     
-            # -----------------------------------------
-            # Collect values for Input Data Sheet-T
-            # -----------------------------------------
-    
-            if length != 0 or (
-                chainage_from not in ("", None)
-                and chainage_to not in ("", None)
-            ):
-    
-                if side == "left":
-    
-                    left_lengths.append(length)
-    
-                    left_from.append(
-                        str(chainage_from)
-                    )
-    
-                    left_to.append(
-                        str(chainage_to)
-                    )
-    
-                elif side == "right":
-    
-                    right_lengths.append(length)
-    
-                    right_from.append(
-                        str(chainage_from)
-                    )
-    
-                    right_to.append(
-                        str(chainage_to)
-                    )
-    
             output_row += 1
-    
-        # =================================================
-        # INPUT DATA SHEET-T
-        # =================================================
-    
-        # -----------------------------------------
-        # LEFT NCG -> Row 19
-        # -----------------------------------------
-    
-        if left_lengths:
-    
-            target_sheet["E19"] = sum(left_lengths)
-    
-            target_sheet["C19"] = "; ".join(
-                left_from
-            )
-    
-            target_sheet["D19"] = "; ".join(
-                left_to
-            )
-    
-        else:
-    
-            target_sheet["E19"] = 0
-            target_sheet["C19"] = ""
-            target_sheet["D19"] = ""
-    
-        # -----------------------------------------
-        # RIGHT NCG -> Row 20
-        # -----------------------------------------
-    
-        if right_lengths:
-    
-            target_sheet["E20"] = sum(right_lengths)
-    
-            target_sheet["C20"] = "; ".join(
-                right_from
-            )
-    
-            target_sheet["D20"] = "; ".join(
-                right_to
-            )
-    
-        else:
-    
-            target_sheet["E20"] = 0
-            target_sheet["C20"] = ""
-            target_sheet["D20"] = ""
     
         return output_row
 
