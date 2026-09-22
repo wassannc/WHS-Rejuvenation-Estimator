@@ -927,6 +927,7 @@ class EstimateGenerator:
         target_sheet["C41"] = "; ".join(left_from) if left_from else ""
         target_sheet["D41"] = "; ".join(left_to) if left_to else ""
         target_sheet["E41"] = left_length if left_from or left_to else 0
+        
     def setup_cghi_formulas(self):
         """
         Consolidate CGHI records from Repeat Details
