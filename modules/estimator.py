@@ -214,10 +214,28 @@ class EstimateGenerator:
             sheet.cell(output_row, 7).value = chainage_to
     
             # Length = Chainage To - Chainage From
-            sheet.cell(output_row, 8).value = (
-                f'=IF(AND(F{output_row}<>"",G{output_row}<>""),'
-                f'G{output_row}-F{output_row},"")'
+            chainage_from = record.get(
+                "chainage_gwr_from",
+                ""
             )
+            
+            chainage_to = record.get(
+                "chainage_gwr_to",
+                ""
+            )
+            
+            try:
+                if chainage_from not in ("", None) and chainage_to not in ("", None):
+                    length = float(chainage_to) - float(chainage_from)
+                else:
+                    length = 0
+            except (TypeError, ValueError):
+                length = 0
+            
+            sheet.cell(
+                output_row,
+                8
+            ).value = length
     
             # Collect values for Sheet-T
             try:
