@@ -206,28 +206,6 @@ if st.button("📄 Generate Estimate", type="primary"):
                 )
             
                 estimator.setup_ltcb_formulas()
-
-                # Write GWR repeat records to Repeat Details
-                next_row = estimator.populate_gwr_repeat(repeat_records)
-                next_row = estimator.populate_ncg_repeat(
-                    repeat_records,
-                    start_row=next_row
-                )
-                next_row = estimator.populate_cghi_repeat(
-                    repeat_records,
-                    start_row=next_row
-                )
-                next_row = estimator.populate_gwbjl_repeat(
-                    repeat_records,
-                    start_row=next_row
-                )
-                estimator.setup_cghi_formulas()
-                estimator.setup_gwbjl_formulas()
-                next_row = estimator.populate_ltcb_repeat(
-                    repeat_records,
-                    start_row=next_row
-                )
-                estimator.setup_ltcb_formulas()
         
             # -----------------------------------------
             # Existing repair population
