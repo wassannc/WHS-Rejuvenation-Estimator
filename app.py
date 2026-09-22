@@ -215,7 +215,6 @@ if st.button("📄 Generate Estimate", type="primary"):
                 repair_record
             )
             
-            estimator.setup_gwr_formulas()
             st.success("✅ Repair data populated")
 
         else:
