@@ -844,89 +844,135 @@ class EstimateGenerator:
     
     def setup_gwr_formulas(self):
         """
-        Consolidate GWR repeat records into Input Data Sheet-T.
+        Populate GWR chainage and length directly into Input Data Sheet-T.
     
-        Right side  -> Row 40
-        Left side   -> Row 41
+        GWR:
+            Right side -> Row 40
+            Left side  -> Row 41
     
-        Chainages are stored as text such as:
-            0.0
-            0.0; 26.0
-            0.0; 26.0; 50.0
-    
-        Length is stored as a numeric total.
+        This version avoids Excel helper-column formulas because
+        Excel recalculation was causing blank / incorrect values.
         """
     
         repeat_sheet = self.workbook["Repeat Details"]
         target_sheet = self.workbook["Input Data Sheet-T"]
     
-        # ---------------------------------------------------------
-        # Find actual GWR records
-        # ---------------------------------------------------------
-    
         right_from = []
         right_to = []
-        right_length = 0
+        right_length = 0.0
     
         left_from = []
         left_to = []
-        left_length = 0
+        left_length = 0.0
     
-        for row in range(2, repeat_sheet.max_row + 1):
+        # ---------------------------------------------------------
+        # Read actual GWR records from Repeat Details
+        # ---------------------------------------------------------
+    
+        for row in range(2, 501):
     
             repeat_group = repeat_sheet.cell(row, 2).value
             side = repeat_sheet.cell(row, 5).value
-    
-            if str(repeat_group).strip().upper() != "GWR":
-                continue
-    
-            side = str(side).strip().lower()
-    
             chain_from = repeat_sheet.cell(row, 6).value
             chain_to = repeat_sheet.cell(row, 7).value
             length = repeat_sheet.cell(row, 8).value
     
-            # Convert length safely
-            try:
-                length = float(length)
-            except (TypeError, ValueError):
-                length = 0
+            if not repeat_group:
+                continue
     
+            if str(repeat_group).strip().upper() != "GWR":
+                continue
+    
+            side = str(side or "").strip().lower()
+    
+            # Convert numeric values safely
+            try:
+                chain_from = float(chain_from) if chain_from not in ("", None) else None
+            except:
+                chain_from = None
+    
+            try:
+                chain_to = float(chain_to) if chain_to not in ("", None) else None
+            except:
+                chain_to = None
+    
+            try:
+                length = float(length) if length not in ("", None) else 0.0
+            except:
+                length = 0.0
+    
+            # -----------------------------------------------------
+            # RIGHT
+            # -----------------------------------------------------
             if side == "right":
     
-                if chain_from not in ("", None):
-                    right_from.append(str(chain_from))
+                if chain_from is not None:
+                    right_from.append(chain_from)
     
-                if chain_to not in ("", None):
-                    right_to.append(str(chain_to))
+                if chain_to is not None:
+                    right_to.append(chain_to)
     
                 right_length += length
     
+            # -----------------------------------------------------
+            # LEFT
+            # -----------------------------------------------------
             elif side == "left":
     
-                if chain_from not in ("", None):
-                    left_from.append(str(chain_from))
+                if chain_from is not None:
+                    left_from.append(chain_from)
     
-                if chain_to not in ("", None):
-                    left_to.append(str(chain_to))
+                if chain_to is not None:
+                    left_to.append(chain_to)
     
                 left_length += length
     
         # ---------------------------------------------------------
-        # Write RIGHT side → T40
+        # Helper to format chainages
         # ---------------------------------------------------------
     
-        target_sheet["C40"] = "; ".join(right_from) if right_from else ""
-        target_sheet["D40"] = "; ".join(right_to) if right_to else ""
-        target_sheet["E40"] = right_length if right_from or right_to else 0
+        def format_chainages(values):
+    
+            if not values:
+                return ""
+    
+            formatted = []
+    
+            for value in values:
+                if float(value).is_integer():
+                    formatted.append(str(int(value)))
+                else:
+                    formatted.append(f"{value:.1f}")
+    
+            return "; ".join(formatted)
     
         # ---------------------------------------------------------
-        # Write LEFT side → T41
+        # RIGHT -> Input Data Sheet-T Row 40
         # ---------------------------------------------------------
     
-        target_sheet["C41"] = "; ".join(left_from) if left_from else ""
-        target_sheet["D41"] = "; ".join(left_to) if left_to else ""
-        target_sheet["E41"] = left_length if left_from or left_to else 0
+        target_sheet["C40"] = format_chainages(right_from)
+        target_sheet["D40"] = format_chainages(right_to)
+        target_sheet["E40"] = right_length
+    
+        # ---------------------------------------------------------
+        # LEFT -> Input Data Sheet-T Row 41
+        # ---------------------------------------------------------
+    
+        target_sheet["C41"] = format_chainages(left_from)
+        target_sheet["D41"] = format_chainages(left_to)
+        target_sheet["E41"] = left_length
+    
+        # ---------------------------------------------------------
+        # Clear old helper columns J:O
+        # ---------------------------------------------------------
+    
+        for row in range(2, 501):
+            for col in range(10, 16):
+                repeat_sheet.cell(row, col).value = None
+    
+        # Hide helper columns
+        for column in ["J", "K", "L", "M", "N", "O"]:
+            repeat_sheet.column_dimensions[column].hidden = True
         
     def setup_cghi_formulas(self):
         """
