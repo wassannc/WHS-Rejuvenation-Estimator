@@ -1,9 +1,11 @@
 import streamlit as st
 import pandas as pd
+
 from modules.odk import ODKCentral
 from modules.estimator import EstimateGenerator
 from modules.processor import RepairProcessor
 from config import REPAIR_FORM_ID
+
 import os
 
 
@@ -21,13 +23,17 @@ st.title("WHS Rejuvenation Estimation")
 
 @st.cache_data(ttl=300)
 def load_basic_data():
+
     odk = ODKCentral()
+
     return odk.get_basic_information()
 
 
 basic = load_basic_data()
 
-st.success(f"{len(basic)} structures loaded")
+st.success(
+    f"{len(basic)} structures loaded"
+)
 
 
 # ---------------------------------------
@@ -40,7 +46,9 @@ col1, col2, col3, col4 = st.columns(4)
 with col1:
 
     districts = sorted(
-        basic["geo-district"].dropna().unique()
+        basic["geo-district"]
+        .dropna()
+        .unique()
     )
 
     district = st.selectbox(
@@ -56,7 +64,9 @@ with col2:
     ]
 
     blocks = sorted(
-        block_df["geo-block"].dropna().unique()
+        block_df["geo-block"]
+        .dropna()
+        .unique()
     )
 
     block = st.selectbox(
@@ -72,7 +82,9 @@ with col3:
     ]
 
     gps = sorted(
-        gp_df["geo-gp"].dropna().unique()
+        gp_df["geo-gp"]
+        .dropna()
+        .unique()
     )
 
     gp = st.selectbox(
@@ -88,7 +100,9 @@ with col4:
     ]
 
     villages = sorted(
-        village_df["geo-village"].dropna().unique()
+        village_df["geo-village"]
+        .dropna()
+        .unique()
     )
 
     village = st.selectbox(
@@ -104,7 +118,9 @@ st.divider()
 # Structure Information
 # ---------------------------------------
 
-st.subheader("📋 Structure Information")
+st.subheader(
+    "📋 Structure Information"
+)
 
 
 structure = village_df[
@@ -117,10 +133,21 @@ col1, col2 = st.columns(2)
 
 with col1:
 
-    st.write(f"**District:** {district}")
-    st.write(f"**Block:** {block}")
-    st.write(f"**GP:** {gp}")
-    st.write(f"**Village:** {village}")
+    st.write(
+        f"**District:** {district}"
+    )
+
+    st.write(
+        f"**Block:** {block}"
+    )
+
+    st.write(
+        f"**GP:** {gp}"
+    )
+
+    st.write(
+        f"**Village:** {village}"
+    )
 
 
 with col2:
@@ -150,7 +177,13 @@ if st.button(
     type="primary"
 ):
 
-    with st.spinner("Loading ODK data..."):
+    # -----------------------------------
+    # Load ODK data
+    # -----------------------------------
+
+    with st.spinner(
+        "Loading ODK data..."
+    ):
 
         odk = ODKCentral()
 
@@ -165,45 +198,56 @@ if st.button(
     # Process data
     # -----------------------------------
 
-    processor = RepairProcessor(repairs)
-
-
-    village_repairs = processor.filter_structure(
-        district,
-        block,
-        gp,
-        village
+    processor = RepairProcessor(
+        repairs
     )
 
 
-    village_lead = processor.filter_lead(
-        lead,
-        district,
-        block,
-        gp,
-        village
+    village_repairs = (
+        processor.filter_structure(
+            district,
+            block,
+            gp,
+            village
+        )
     )
 
 
-    village_discharge = processor.filter_discharge(
-        discharge,
-        district,
-        block,
-        gp,
-        village
+    village_lead = (
+        processor.filter_lead(
+            lead,
+            district,
+            block,
+            gp,
+            village
+        )
+    )
+
+
+    village_discharge = (
+        processor.filter_discharge(
+            discharge,
+            district,
+            block,
+            gp,
+            village
+        )
     )
 
 
     st.success(
-        f"Found {len(village_lead)} lead record(s)"
+        f"Found {len(village_lead)} "
+        f"lead record(s)"
     )
 
     st.success(
-        f"Found {len(village_discharge)} discharge record(s)"
+        f"Found {len(village_discharge)} "
+        f"discharge record(s)"
     )
 
     st.success(
-        f"Found {len(village_repairs)} repair record(s)"
+        f"Found {len(village_repairs)} "
+        f"repair record(s)"
     )
 
 
@@ -251,13 +295,15 @@ if st.button(
             )
 
 
-            # -----------------------------------------
-            # Repeat records
-            # -----------------------------------------
+            # -------------------------------------
+            # Get repeat records
+            # -------------------------------------
 
-            parent_key = repair_record.get(
-                "KEY",
-                ""
+            parent_key = (
+                repair_record.get(
+                    "KEY",
+                    ""
+                )
             )
 
 
@@ -271,9 +317,10 @@ if st.button(
                 )
 
 
-                # -------------------------------------
-                # Populate repeat records ONLY ONCE
-                # -------------------------------------
+                # ---------------------------------
+                # Populate Repeat Details
+                # ONLY ONCE
+                # ---------------------------------
 
                 next_row = (
                     estimator.populate_gwr_repeat(
@@ -397,6 +444,11 @@ if st.button(
         # -----------------------------------------
         # FINAL REPEAT CALCULATIONS
         # -----------------------------------------
+        #
+        # IMPORTANT:
+        # These are called ONLY AFTER
+        # all Repeat Details have been populated.
+        # -----------------------------------------
 
         estimator.setup_gwr_formulas()
 
@@ -440,7 +492,9 @@ if st.button(
     # Download
     # -----------------------------------------
 
-    if os.path.exists(output_file):
+    if os.path.exists(
+        output_file
+    ):
 
         st.success(
             "✅ File created successfully!"
@@ -455,7 +509,9 @@ if st.button(
             st.download_button(
                 label="📥 Download Estimate",
                 data=f,
-                file_name=f"{village}_Estimate.xlsx",
+                file_name=(
+                    f"{village}_Estimate.xlsx"
+                ),
                 mime=(
                     "application/vnd.openxmlformats-"
                     "officedocument.spreadsheetml.sheet"
