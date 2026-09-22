@@ -844,188 +844,89 @@ class EstimateGenerator:
     
     def setup_gwr_formulas(self):
         """
-        Consolidate GWR records from Repeat Details
-        separately for Right and Left sides.
+        Consolidate GWR repeat records into Input Data Sheet-T.
     
-        J = Right From
-        K = Right To
-        L = Right Length
+        Right side  -> Row 40
+        Left side   -> Row 41
     
-        M = Left From
-        N = Left To
-        O = Left Length
+        Chainages are stored as text such as:
+            0.0
+            0.0; 26.0
+            0.0; 26.0; 50.0
+    
+        Length is stored as a numeric total.
         """
     
         repeat_sheet = self.workbook["Repeat Details"]
         target_sheet = self.workbook["Input Data Sheet-T"]
     
-        # -------------------------------------------------
-        # Find the actual last populated Repeat Details row
-        # -------------------------------------------------
+        # ---------------------------------------------------------
+        # Find actual GWR records
+        # ---------------------------------------------------------
     
-        last_row = repeat_sheet.max_row
+        right_from = []
+        right_to = []
+        right_length = 0
     
-        # -------------------------------------------------
-        # RIGHT SIDE
-        # -------------------------------------------------
+        left_from = []
+        left_to = []
+        left_length = 0
     
-        right_rows = []
+        for row in range(2, repeat_sheet.max_row + 1):
     
-        for row in range(2, last_row + 1):
-    
-            group = repeat_sheet.cell(row, 2).value
+            repeat_group = repeat_sheet.cell(row, 2).value
             side = repeat_sheet.cell(row, 5).value
     
-            if (
-                str(group).strip().upper() == "GWR"
-                and str(side).strip().lower() == "right"
-            ):
-                right_rows.append(row)
+            if str(repeat_group).strip().upper() != "GWR":
+                continue
     
-        # -------------------------------------------------
-        # LEFT SIDE
-        # -------------------------------------------------
+            side = str(side).strip().lower()
     
-        left_rows = []
+            chain_from = repeat_sheet.cell(row, 6).value
+            chain_to = repeat_sheet.cell(row, 7).value
+            length = repeat_sheet.cell(row, 8).value
     
-        for row in range(2, last_row + 1):
+            # Convert length safely
+            try:
+                length = float(length)
+            except (TypeError, ValueError):
+                length = 0
     
-            group = repeat_sheet.cell(row, 2).value
-            side = repeat_sheet.cell(row, 5).value
+            if side == "right":
     
-            if (
-                str(group).strip().upper() == "GWR"
-                and str(side).strip().lower() == "left"
-            ):
-                left_rows.append(row)
+                if chain_from not in ("", None):
+                    right_from.append(str(chain_from))
     
-        # -------------------------------------------------
-        # Clear old helper formulas
-        # -------------------------------------------------
+                if chain_to not in ("", None):
+                    right_to.append(str(chain_to))
     
-        for row in range(2, 501):
+                right_length += length
     
-            for col in range(10, 16):
-                repeat_sheet.cell(row, col).value = None
+            elif side == "left":
     
-        # -------------------------------------------------
-        # Create RIGHT-side values
-        # -------------------------------------------------
+                if chain_from not in ("", None):
+                    left_from.append(str(chain_from))
     
-        if right_rows:
+                if chain_to not in ("", None):
+                    left_to.append(str(chain_to))
     
-            right_from_parts = []
-            right_to_parts = []
-            right_length_parts = []
+                left_length += length
     
-            for row in right_rows:
+        # ---------------------------------------------------------
+        # Write RIGHT side → T40
+        # ---------------------------------------------------------
     
-                right_from_parts.append(
-                    f'TEXT(F{row},"0.0")'
-                )
+        target_sheet["C40"] = "; ".join(right_from) if right_from else ""
+        target_sheet["D40"] = "; ".join(right_to) if right_to else ""
+        target_sheet["E40"] = right_length if right_from or right_to else 0
     
-                right_to_parts.append(
-                    f'TEXT(G{row},"0.0")'
-                )
+        # ---------------------------------------------------------
+        # Write LEFT side → T41
+        # ---------------------------------------------------------
     
-                right_length_parts.append(
-                    f'H{row}'
-                )
-    
-            # J = Right From
-            repeat_sheet["J500"] = (
-                "=" +
-                "&\"; \"&".join(right_from_parts)
-            )
-    
-            # K = Right To
-            repeat_sheet["K500"] = (
-                "=" +
-                "&\"; \"&".join(right_to_parts)
-            )
-    
-            # L = Right Length
-            repeat_sheet["L500"] = (
-                "=" +
-                "+".join(right_length_parts)
-            )
-    
-        else:
-    
-            repeat_sheet["J500"] = '=""'
-            repeat_sheet["K500"] = '=""'
-            repeat_sheet["L500"] = "=0"
-    
-        # -------------------------------------------------
-        # Create LEFT-side values
-        # -------------------------------------------------
-    
-        if left_rows:
-    
-            left_from_parts = []
-            left_to_parts = []
-            left_length_parts = []
-    
-            for row in left_rows:
-    
-                left_from_parts.append(
-                    f'TEXT(F{row},"0.0")'
-                )
-    
-                left_to_parts.append(
-                    f'TEXT(G{row},"0.0")'
-                )
-    
-                left_length_parts.append(
-                    f'H{row}'
-                )
-    
-            # M = Left From
-            repeat_sheet["M500"] = (
-                "=" +
-                "&\"; \"&".join(left_from_parts)
-            )
-    
-            # N = Left To
-            repeat_sheet["N500"] = (
-                "=" +
-                "&\"; \"&".join(left_to_parts)
-            )
-    
-            # O = Left Length
-            repeat_sheet["O500"] = (
-                "=" +
-                "+".join(left_length_parts)
-            )
-    
-        else:
-    
-            repeat_sheet["M500"] = '=""'
-            repeat_sheet["N500"] = '=""'
-            repeat_sheet["O500"] = "=0"
-    
-        # -------------------------------------------------
-        # Send values to Input Data Sheet-T
-        # -------------------------------------------------
-    
-        # GWR RIGHT → Row 40
-    
-        target_sheet["C40"] = "='Repeat Details'!J500"
-        target_sheet["D40"] = "='Repeat Details'!K500"
-        target_sheet["E40"] = "='Repeat Details'!L500"
-    
-        # GWR LEFT → Row 41
-    
-        target_sheet["C41"] = "='Repeat Details'!M500"
-        target_sheet["D41"] = "='Repeat Details'!N500"
-        target_sheet["E41"] = "='Repeat Details'!O500"
-    
-        # -------------------------------------------------
-        # Hide helper columns
-        # -------------------------------------------------
-    
-        for column in ["J", "K", "L", "M", "N", "O"]:
-            repeat_sheet.column_dimensions[column].hidden = True
+        target_sheet["C41"] = "; ".join(left_from) if left_from else ""
+        target_sheet["D41"] = "; ".join(left_to) if left_to else ""
+        target_sheet["E41"] = left_length if left_from or left_to else 0
     def setup_cghi_formulas(self):
         """
         Consolidate CGHI records from Repeat Details
