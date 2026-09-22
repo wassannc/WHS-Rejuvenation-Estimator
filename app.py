@@ -6,6 +6,7 @@ from modules.processor import RepairProcessor
 from config import REPAIR_FORM_ID
 import os
 
+
 st.set_page_config(
     page_title="WHS Rejuvenation Estimation System",
     layout="wide"
@@ -13,15 +14,21 @@ st.set_page_config(
 
 st.title("WHS Rejuvenation Estimation")
 
+
 # ---------------------------------------
 # Load Basic Information
 # ---------------------------------------
+
 @st.cache_data(ttl=300)
 def load_basic_data():
     odk = ODKCentral()
     return odk.get_basic_information()
+
+
 basic = load_basic_data()
+
 st.success(f"{len(basic)} structures loaded")
+
 
 # ---------------------------------------
 # Cascading Filters
@@ -29,7 +36,9 @@ st.success(f"{len(basic)} structures loaded")
 
 col1, col2, col3, col4 = st.columns(4)
 
+
 with col1:
+
     districts = sorted(
         basic["geo-district"].dropna().unique()
     )
@@ -39,7 +48,9 @@ with col1:
         districts
     )
 
+
 with col2:
+
     block_df = basic[
         basic["geo-district"] == district
     ]
@@ -53,7 +64,9 @@ with col2:
         blocks
     )
 
+
 with col3:
+
     gp_df = block_df[
         block_df["geo-block"] == block
     ]
@@ -67,7 +80,9 @@ with col3:
         gps
     )
 
+
 with col4:
+
     village_df = gp_df[
         gp_df["geo-gp"] == gp
     ]
@@ -80,40 +95,78 @@ with col4:
         "Village",
         villages
     )
+
+
 st.divider()
 
+
+# ---------------------------------------
+# Structure Information
+# ---------------------------------------
+
 st.subheader("📋 Structure Information")
+
 
 structure = village_df[
     village_df["geo-village"] == village
 ].iloc[0]
 
+
 col1, col2 = st.columns(2)
 
+
 with col1:
+
     st.write(f"**District:** {district}")
     st.write(f"**Block:** {block}")
     st.write(f"**GP:** {gp}")
     st.write(f"**Village:** {village}")
 
-with col2:
-    st.write(f"**Latitude:** {structure['geo-village_gps-Latitude']}")
-    st.write(f"**Longitude:** {structure['geo-village_gps-Longitude']}")
-    st.write(f"**Altitude:** {structure['geo-village_gps-Altitude']}")
 
-if st.button("📄 Generate Estimate", type="primary"):
+with col2:
+
+    st.write(
+        f"**Latitude:** "
+        f"{structure['geo-village_gps-Latitude']}"
+    )
+
+    st.write(
+        f"**Longitude:** "
+        f"{structure['geo-village_gps-Longitude']}"
+    )
+
+    st.write(
+        f"**Altitude:** "
+        f"{structure['geo-village_gps-Altitude']}"
+    )
+
+
+# ---------------------------------------
+# Generate Estimate
+# ---------------------------------------
+
+if st.button(
+    "📄 Generate Estimate",
+    type="primary"
+):
 
     with st.spinner("Loading ODK data..."):
 
         odk = ODKCentral()
 
         repairs = odk.get_repairs()
-        
+
         lead = odk.get_lead()
 
         discharge = odk.get_discharge()
 
+
+    # -----------------------------------
+    # Process data
+    # -----------------------------------
+
     processor = RepairProcessor(repairs)
+
 
     village_repairs = processor.filter_structure(
         district,
@@ -121,7 +174,8 @@ if st.button("📄 Generate Estimate", type="primary"):
         gp,
         village
     )
-    
+
+
     village_lead = processor.filter_lead(
         lead,
         district,
@@ -129,7 +183,8 @@ if st.button("📄 Generate Estimate", type="primary"):
         gp,
         village
     )
-    
+
+
     village_discharge = processor.filter_discharge(
         discharge,
         district,
@@ -138,152 +193,278 @@ if st.button("📄 Generate Estimate", type="primary"):
         village
     )
 
-    st.success(f"Found {len(village_lead)} lead record(s)")
-    st.success(f"Found {len(village_discharge)} discharge record(s)")
-    st.success(f"Found {len(village_repairs)} repair record(s)")
+
+    st.success(
+        f"Found {len(village_lead)} lead record(s)"
+    )
+
+    st.success(
+        f"Found {len(village_discharge)} discharge record(s)"
+    )
+
+    st.success(
+        f"Found {len(village_repairs)} repair record(s)"
+    )
+
 
     try:
+
+        # -----------------------------------------
         # Create estimate workbook
+        # -----------------------------------------
+
         estimator = EstimateGenerator()
-        # -------------------------
+
+
+        # -----------------------------------------
         # Sheet-G
-        # -------------------------
+        # -----------------------------------------
+
         record = structure.to_dict()
+
 
         estimator.populate_sheet(
             "Input Data Sheet-G",
             record
         )
 
-        estimator.write_fixed_values(record)
 
-        st.success("✅ Input Data Sheet-G populated")
+        estimator.write_fixed_values(
+            record
+        )
 
-        # -------------------------
+
+        st.success(
+            "✅ Input Data Sheet-G populated"
+        )
+
+
+        # -----------------------------------------
         # Sheet-T
-        # -------------------------
-        # -------------------------
         # Repairs
-        # -------------------------
+        # -----------------------------------------
+
         if len(village_repairs) > 0:
 
-            repair_record = village_repairs.iloc[0].to_dict()
-        
+            repair_record = (
+                village_repairs.iloc[0].to_dict()
+            )
+
+
             # -----------------------------------------
             # Repeat records
             # -----------------------------------------
-            parent_key = repair_record.get("KEY", "")
-            
+
+            parent_key = repair_record.get(
+                "KEY",
+                ""
+            )
+
+
             if parent_key:
-                repeat_records = odk.get_repeat_records(
-                    REPAIR_FORM_ID,
-                    parent_key
+
+                repeat_records = (
+                    odk.get_repeat_records(
+                        REPAIR_FORM_ID,
+                        parent_key
+                    )
                 )
-            
-                # Populate repeat records
-                next_row = estimator.populate_gwr_repeat(
-                    repeat_records
+
+
+                # -------------------------------------
+                # Populate repeat records ONLY ONCE
+                # -------------------------------------
+
+                next_row = (
+                    estimator.populate_gwr_repeat(
+                        repeat_records
+                    )
                 )
-            
-                next_row = estimator.populate_ncg_repeat(
-                    repeat_records,
-                    start_row=next_row
+
+
+                next_row = (
+                    estimator.populate_ncg_repeat(
+                        repeat_records,
+                        start_row=next_row
+                    )
                 )
-            
-                next_row = estimator.populate_cghi_repeat(
-                    repeat_records,
-                    start_row=next_row
+
+
+                next_row = (
+                    estimator.populate_cghi_repeat(
+                        repeat_records,
+                        start_row=next_row
+                    )
                 )
-            
-                next_row = estimator.populate_gwbjl_repeat(
-                    repeat_records,
-                    start_row=next_row
+
+
+                next_row = (
+                    estimator.populate_gwbjl_repeat(
+                        repeat_records,
+                        start_row=next_row
+                    )
                 )
-            
-                next_row = estimator.populate_ltcb_repeat(
-                    repeat_records,
-                    start_row=next_row
+
+
+                next_row = (
+                    estimator.populate_ltcb_repeat(
+                        repeat_records,
+                        start_row=next_row
+                    )
                 )
-            
-                estimator.setup_ltcb_formulas()
-        
+
+
             # -----------------------------------------
             # Existing repair population
             # -----------------------------------------
+
             estimator.populate_sheet(
                 "Input Data Sheet-T",
                 repair_record
             )
-            
-            st.success("✅ Repair data populated")
+
+
+            st.success(
+                "✅ Repair data populated"
+            )
+
 
         else:
 
-            st.warning("No repair records found.")
+            st.warning(
+                "No repair records found."
+            )
 
-        # -------------------------
+
+        # -----------------------------------------
         # Lead Statement
-        # -------------------------
+        # -----------------------------------------
+
         if len(village_lead) > 0:
 
-            lead_record = village_lead.iloc[0].to_dict()
+            lead_record = (
+                village_lead.iloc[0].to_dict()
+            )
+
 
             estimator.populate_sheet(
                 "Input Data Sheet-T",
                 lead_record
             )
 
-            st.success("✅ Lead Statement populated")
+
+            st.success(
+                "✅ Lead Statement populated"
+            )
+
 
         else:
 
-            st.warning("No Lead Statement found.")
-        # -------------------------
+            st.warning(
+                "No Lead Statement found."
+            )
+
+
+        # -----------------------------------------
         # Discharge
-        # -------------------------
+        # -----------------------------------------
+
         if len(village_discharge) > 0:
 
-            discharge_record = village_discharge.iloc[0].to_dict()
+            discharge_record = (
+                village_discharge.iloc[0].to_dict()
+            )
+
 
             estimator.populate_sheet(
                 "Input Data Sheet-T",
                 discharge_record
-             )
+            )
 
-            st.success("✅ Discharge data populated")
+
+            st.success(
+                "✅ Discharge data populated"
+            )
+
 
         else:
 
-            st.warning("No Discharge record found.")
-            
+            st.warning(
+                "No Discharge record found."
+            )
+
+
+        # -----------------------------------------
+        # FINAL REPEAT CALCULATIONS
+        # -----------------------------------------
+
         estimator.setup_gwr_formulas()
+
         estimator.setup_cghi_formulas()
+
         estimator.setup_gwbjl_formulas()
 
+        estimator.setup_ltcb_formulas()
+
+
     except Exception as e:
-        st.error(f"Populate Error: {e}")
+
+        st.error(
+            f"Populate Error: {e}"
+        )
+
         st.stop()
+
+
+    # -----------------------------------------
+    # Output file
+    # -----------------------------------------
 
     output_file = os.path.join(
         "output",
         f"{village}_Estimate.xlsx"
     )
 
-    estimator.save(output_file)
 
-    st.success("✅ Estimate workbook created successfully!")
+    estimator.save(
+        output_file
+    )
 
-    import os
+
+    st.success(
+        "✅ Estimate workbook created successfully!"
+    )
+
+
+    # -----------------------------------------
+    # Download
+    # -----------------------------------------
 
     if os.path.exists(output_file):
-        st.success("✅ File created successfully!")
 
-        with open(output_file, "rb") as f:
+        st.success(
+            "✅ File created successfully!"
+        )
+
+
+        with open(
+            output_file,
+            "rb"
+        ) as f:
+
             st.download_button(
                 label="📥 Download Estimate",
                 data=f,
                 file_name=f"{village}_Estimate.xlsx",
-                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                mime=(
+                    "application/vnd.openxmlformats-"
+                    "officedocument.spreadsheetml.sheet"
+                )
             )
+
+
     else:
-        st.error("❌ File was NOT created.")
+
+        st.error(
+            "❌ File was NOT created."
+        )
