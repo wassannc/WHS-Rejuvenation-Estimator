@@ -200,10 +200,6 @@ if st.button("📄 Generate Estimate", type="primary"):
                     start_row=next_row
                 )
             
-                estimator.setup_gwr_formulas()
-                estimator.setup_cghi_formulas()
-                estimator.setup_gwbjl_formulas()
-            
                 next_row = estimator.populate_ltcb_repeat(
                     repeat_records,
                     start_row=next_row
@@ -282,6 +278,10 @@ if st.button("📄 Generate Estimate", type="primary"):
         else:
 
             st.warning("No Discharge record found.")
+            
+        estimator.setup_gwr_formulas()
+        estimator.setup_cghi_formulas()
+        estimator.setup_gwbjl_formulas()
 
     except Exception as e:
         st.error(f"Populate Error: {e}")
