@@ -1167,7 +1167,6 @@ class EstimateGenerator:
         # -----------------------------------------
         # FINAL GWR VALUES
         # -----------------------------------------
-        estimator.setup_gwr_formulas()
         estimator.write_final_gwr_values()
 
         self.workbook.save(filename)
