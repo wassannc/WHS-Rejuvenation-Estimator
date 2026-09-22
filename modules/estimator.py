@@ -1110,6 +1110,51 @@ class EstimateGenerator:
     
         for column in ["P", "Q", "R", "S", "T", "U"]:
             repeat_sheet.column_dimensions[column].hidden = True
+            
+    def write_final_gwr_values(self):
+        """
+        Write consolidated GWR values directly into Input Data Sheet-T.
+        Avoids Excel formula/cached-value issues.
+        """
+    
+        repeat_sheet = self.workbook["Repeat Details"]
+        target_sheet = self.workbook["Input Data Sheet-T"]
+    
+        # -------------------------------------------------
+        # Read final helper values
+        # -------------------------------------------------
+        right_from = repeat_sheet["J500"].value
+        right_to = repeat_sheet["K500"].value
+        right_length = repeat_sheet["L500"].value
+    
+        left_from = repeat_sheet["M500"].value
+        left_to = repeat_sheet["N500"].value
+        left_length = repeat_sheet["O500"].value
+    
+        # -------------------------------------------------
+        # Write RIGHT GWR → Row 40
+        # -------------------------------------------------
+        target_sheet["C40"] = right_from if right_from not in (None, "") else ""
+        target_sheet["D40"] = right_to if right_to not in (None, "") else ""
+        target_sheet["E40"] = right_length if right_length not in (None, "") else 0
+    
+        # -------------------------------------------------
+        # Write LEFT GWR → Row 41
+        # -------------------------------------------------
+        target_sheet["C41"] = left_from if left_from not in (None, "") else ""
+        target_sheet["D41"] = left_to if left_to not in (None, "") else ""
+        target_sheet["E41"] = left_length if left_length not in (None, "") else 0
+    
+        # -------------------------------------------------
+        # Qty = Length × Breadth × Depth
+        # -------------------------------------------------
+        target_sheet["H40"] = (
+            f'=IF(OR(E40="",F40="",G40=""),0,E40*F40*G40)'
+        )
+    
+        target_sheet["H41"] = (
+            f'=IF(OR(E41="",F41="",G41=""),0,E41*F41*G41)'
+        )
     def save(self, filename):
 
         os.makedirs("output", exist_ok=True)
@@ -1118,5 +1163,11 @@ class EstimateGenerator:
         self.workbook.calculation.fullCalcOnLoad = True
         self.workbook.calculation.forceFullCalc = True
         self.workbook.calculation.calcMode = "auto"
+
+        # -----------------------------------------
+        # FINAL GWR VALUES
+        # -----------------------------------------
+        estimator.setup_gwr_formulas()
+        estimator.write_final_gwr_values()
 
         self.workbook.save(filename)
