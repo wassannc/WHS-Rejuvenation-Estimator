@@ -1164,9 +1164,4 @@ class EstimateGenerator:
         self.workbook.calculation.forceFullCalc = True
         self.workbook.calculation.calcMode = "auto"
 
-        # -----------------------------------------
-        # FINAL GWR VALUES
-        # -----------------------------------------
-        self.write_final_gwr_values()
-
         self.workbook.save(filename)
