@@ -332,7 +332,6 @@ class EstimateGenerator:
                 length = 0
             
             sheet.cell(output_row, 8).value = length
-            )
     
             output_row += 1
     
