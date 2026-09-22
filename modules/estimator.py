@@ -201,83 +201,161 @@ class EstimateGenerator:
             ncg_df.iterrows(), start=1
         ):
     
-            side = str(record.get("guidewalls_side", "")).strip().lower()
+            # -----------------------------------------
+            # NCG fields
+            # -----------------------------------------
     
-            chainage_from = record.get("chainage_ncg_from", "")
-            chainage_to = record.get("chainage_ncg_to", "")
+            side = str(
+                record.get("guidewalls_side", "")
+            ).strip().lower()
     
-            sheet.cell(output_row, 2).value = "NCG"
-            sheet.cell(output_row, 3).value = "New Canal Guidewall"
-            sheet.cell(output_row, 4).value = record_no
-            sheet.cell(output_row, 5).value = side
-            sheet.cell(output_row, 6).value = chainage_from
-            sheet.cell(output_row, 7).value = chainage_to
-    
-            # Length = Chainage To - Chainage From
             chainage_from = record.get(
-                "chainage_gwr_from",
+                "chainage_ncg_from",
                 ""
             )
-            
+    
             chainage_to = record.get(
-                "chainage_gwr_to",
+                "chainage_ncg_to",
                 ""
             )
-            
-            try:
-                if chainage_from not in ("", None) and chainage_to not in ("", None):
-                    length = float(chainage_to) - float(chainage_from)
-                else:
-                    length = 0
-            except (TypeError, ValueError):
-                length = 0
-            
+    
+            # -----------------------------------------
+            # Write basic NCG information
+            # -----------------------------------------
+    
             sheet.cell(
-                output_row,
-                8
+                output_row, 2
+            ).value = "NCG"
+    
+            sheet.cell(
+                output_row, 3
+            ).value = "New Canal Guidewall"
+    
+            sheet.cell(
+                output_row, 4
+            ).value = record_no
+    
+            sheet.cell(
+                output_row, 5
+            ).value = side
+    
+            sheet.cell(
+                output_row, 6
+            ).value = chainage_from
+    
+            sheet.cell(
+                output_row, 7
+            ).value = chainage_to
+    
+            # -----------------------------------------
+            # Calculate NCG Length
+            # H = G - F
+            # -----------------------------------------
+    
+            try:
+    
+                if (
+                    chainage_from not in ("", None)
+                    and
+                    chainage_to not in ("", None)
+                ):
+    
+                    cf = float(chainage_from)
+                    ct = float(chainage_to)
+    
+                    length = ct - cf
+    
+                else:
+    
+                    length = 0
+    
+            except (TypeError, ValueError):
+    
+                length = 0
+    
+            sheet.cell(
+                output_row, 8
             ).value = length
     
-            # Collect values for Sheet-T
-            try:
-                cf = float(chainage_from)
-                ct = float(chainage_to)
-                length = ct - cf
+            # -----------------------------------------
+            # Collect values for Input Data Sheet-T
+            # -----------------------------------------
+    
+            if length != 0 or (
+                chainage_from not in ("", None)
+                and chainage_to not in ("", None)
+            ):
     
                 if side == "left":
+    
                     left_lengths.append(length)
-                    left_from.append(str(chainage_from))
-                    left_to.append(str(chainage_to))
+    
+                    left_from.append(
+                        str(chainage_from)
+                    )
+    
+                    left_to.append(
+                        str(chainage_to)
+                    )
     
                 elif side == "right":
-                    right_lengths.append(length)
-                    right_from.append(str(chainage_from))
-                    right_to.append(str(chainage_to))
     
-            except (ValueError, TypeError):
-                pass
+                    right_lengths.append(length)
+    
+                    right_from.append(
+                        str(chainage_from)
+                    )
+    
+                    right_to.append(
+                        str(chainage_to)
+                    )
     
             output_row += 1
     
-        # -------------------------------------------------
-        # Populate Input Data Sheet-T
-        # -------------------------------------------------
+        # =================================================
+        # INPUT DATA SHEET-T
+        # =================================================
     
+        # -----------------------------------------
         # LEFT NCG -> Row 19
+        # -----------------------------------------
+    
         if left_lengths:
+    
             target_sheet["E19"] = sum(left_lengths)
-            target_sheet["C19"] = "; ".join(left_from)
-            target_sheet["D19"] = "; ".join(left_to)
+    
+            target_sheet["C19"] = "; ".join(
+                left_from
+            )
+    
+            target_sheet["D19"] = "; ".join(
+                left_to
+            )
+    
         else:
+    
             target_sheet["E19"] = 0
             target_sheet["C19"] = ""
             target_sheet["D19"] = ""
     
+        # -----------------------------------------
         # RIGHT NCG -> Row 20
+        # -----------------------------------------
+    
         if right_lengths:
+    
             target_sheet["E20"] = sum(right_lengths)
-            target_sheet["C20"] = "; ".join(right_from)
-            target_sheet["D20"] = "; ".join(right_to)
+    
+            target_sheet["C20"] = "; ".join(
+                right_from
+            )
+    
+            target_sheet["D20"] = "; ".join(
+                right_to
+            )
+    
         else:
+    
             target_sheet["E20"] = 0
             target_sheet["C20"] = ""
             target_sheet["D20"] = ""
