@@ -381,72 +381,49 @@ class EstimateGenerator:
         """
         Link NCG records from Repeat Details to Input Data Sheet-T.
     
-        Compatible with:
-            - Excel 2019
-            - Excel 2021
-            - Excel 2024
-            - Microsoft 365
-    
-        Does NOT use FILTER() or dynamic-array formulas.
-    
-        LEFT NCG  -> Row 19
-        RIGHT NCG -> Row 20
+        Compatible with Excel 2019 and later.
+        Uses helper columns J:M instead of FILTER().
         """
     
-        repeat_sheet = self.workbook["Repeat Details"]
         target_sheet = self.workbook["Input Data Sheet-T"]
+        repeat_sheet = self.workbook["Repeat Details"]
     
-        # =========================================================
-        # HELPER COLUMNS IN REPEAT DETAILS
-        # =========================================================
-        #
-        # J = Left NCG Chainage From
-        # K = Left NCG Chainage To
-        # L = Right NCG Chainage From
-        # M = Right NCG Chainage To
-        #
-        # These formulas are row-by-row, so they also respond when
-        # the user manually edits/adds NCG records.
-        # =========================================================
+        # -------------------------------------------------
+        # HELPER FORMULAS IN REPEAT DETAILS
+        # -------------------------------------------------
     
         for row in range(2, 501):
     
-            # LEFT NCG - Chainage From
+            # H = Length
+            repeat_sheet.cell(row, 8).value = (
+                f'=IF(OR(F{row}="",G{row}=""),"",G{row}-F{row})'
+            )
+    
+            # J = Left NCG From
             repeat_sheet.cell(row, 10).value = (
-                f'=IF(AND($B{row}="NCG",'
-                f'LOWER($E{row})="left"),'
-                f'$F{row},"")'
+                f'=IF(AND($B{row}="NCG",LOWER($E{row})="left"),$F{row},"")'
             )
     
-            # LEFT NCG - Chainage To
+            # K = Left NCG To
             repeat_sheet.cell(row, 11).value = (
-                f'=IF(AND($B{row}="NCG",'
-                f'LOWER($E{row})="left"),'
-                f'$G{row},"")'
+                f'=IF(AND($B{row}="NCG",LOWER($E{row})="left"),$G{row},"")'
             )
     
-            # RIGHT NCG - Chainage From
+            # L = Right NCG From
             repeat_sheet.cell(row, 12).value = (
-                f'=IF(AND($B{row}="NCG",'
-                f'LOWER($E{row})="right"),'
-                f'$F{row},"")'
+                f'=IF(AND($B{row}="NCG",LOWER($E{row})="right"),$F{row},"")'
             )
     
-            # RIGHT NCG - Chainage To
+            # M = Right NCG To
             repeat_sheet.cell(row, 13).value = (
-                f'=IF(AND($B{row}="NCG",'
-                f'LOWER($E{row})="right"),'
-                f'$G{row},"")'
+                f'=IF(AND($B{row}="NCG",LOWER($E{row})="right"),$G{row},"")'
             )
     
-        # =========================================================
+        # -------------------------------------------------
         # INPUT DATA SHEET-T
-        # =========================================================
+        # -------------------------------------------------
     
-        # ---------------------------------------------------------
-        # LEFT NCG -> ROW 19
-        # ---------------------------------------------------------
-    
+        # LEFT NCG
         target_sheet["C19"] = (
             '=IFERROR(TEXTJOIN("; ",TRUE,'
             "'Repeat Details'!J2:J500),\"\")"
@@ -461,13 +438,11 @@ class EstimateGenerator:
             '=SUMIFS('
             "'Repeat Details'!H2:H500,"
             "'Repeat Details'!B2:B500,\"NCG\","
-            "'Repeat Details'!E2:E500,\"left\")"
+            "'Repeat Details'!E2:E500,\"left\""
+            ')'
         )
     
-        # ---------------------------------------------------------
-        # RIGHT NCG -> ROW 20
-        # ---------------------------------------------------------
-    
+        # RIGHT NCG
         target_sheet["C20"] = (
             '=IFERROR(TEXTJOIN("; ",TRUE,'
             "'Repeat Details'!L2:L500),\"\")"
@@ -482,12 +457,13 @@ class EstimateGenerator:
             '=SUMIFS('
             "'Repeat Details'!H2:H500,"
             "'Repeat Details'!B2:B500,\"NCG\","
-            "'Repeat Details'!E2:E500,\"right\")"
+            "'Repeat Details'!E2:E500,\"right\""
+            ')'
         )
     
-        # =========================================================
+        # -------------------------------------------------
         # QUANTITY
-        # =========================================================
+        # -------------------------------------------------
     
         target_sheet["H19"] = "=E19*F19*G19"
         target_sheet["H20"] = "=E20*F20*G20"
