@@ -404,9 +404,12 @@ class EstimateGenerator:
         )
     
         target_sheet["E19"] = (
-            '=SUMIFS(\'Repeat Details\'!H$2:H$500,'
-            '\'Repeat Details\'!B$2:B$500,"NCG",'
-            '\'Repeat Details\'!E$2:E$500,"left")'
+            '=SUMPRODUCT('
+            '(TRIM(\'Repeat Details\'!B$2:B$500)="NCG")*'
+            '(TRIM(\'Repeat Details\'!E$2:E$500)="left")*'
+            '(IFERROR(\'Repeat Details\'!G$2:G$500,0)-'
+            'IFERROR(\'Repeat Details\'!F$2:F$500,0))'
+            ')'
         )
     
         # RIGHT NCG
@@ -425,9 +428,12 @@ class EstimateGenerator:
         )
     
         target_sheet["E20"] = (
-            '=SUMIFS(\'Repeat Details\'!H$2:H$500,'
-            '\'Repeat Details\'!B$2:B$500,"NCG",'
-            '\'Repeat Details\'!E$2:E$500,"right")'
+            '=SUMPRODUCT('
+            '(TRIM(\'Repeat Details\'!B$2:B$500)="NCG")*'
+            '(TRIM(\'Repeat Details\'!E$2:E$500)="right")*'
+            '(IFERROR(\'Repeat Details\'!G$2:G$500,0)-'
+            'IFERROR(\'Repeat Details\'!F$2:F$500,0))'
+            ')'
         )
     
         # Quantity
