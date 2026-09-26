@@ -379,110 +379,82 @@ class EstimateGenerator:
 
     def setup_ncg_formulas(self):
         """
-        Populate NCG values in Input Data Sheet-T
-        from Repeat Details.
+        Dynamically link NCG records from Repeat Details
+        to Input Data Sheet-T.
     
-        LEFT NCG  -> Row 19
-        RIGHT NCG -> Row 20
+        This allows BOTH:
+        1. ODK-generated NCG records
+        2. Manually added NCG records
     
-        Values are written directly by Python so that
-        the generated workbook contains the correct values
-        immediately. No Excel formulas are used here.
+        to automatically appear in Sheet-T.
         """
     
-        repeat_sheet = self.workbook["Repeat Details"]
         target_sheet = self.workbook["Input Data Sheet-T"]
     
-        left_from = []
-        left_to = []
-        left_lengths = []
-    
-        right_from = []
-        right_to = []
-        right_lengths = []
-    
-        # -------------------------------------------------
-        # Read NCG records from Repeat Details
-        # -------------------------------------------------
-    
-        for row in range(2, 501):
-    
-            repeat_group = str(
-                repeat_sheet.cell(row, 2).value or ""
-            ).strip().upper()
-    
-            side = str(
-                repeat_sheet.cell(row, 5).value or ""
-            ).strip().lower()
-    
-            chainage_from = repeat_sheet.cell(row, 6).value
-            chainage_to = repeat_sheet.cell(row, 7).value
-    
-            # Only NCG records
-            if repeat_group != "NCG":
-                continue
-    
-            # Skip records without chainages
-            if chainage_from in ("", None) or chainage_to in ("", None):
-                continue
-    
-            try:
-                cf = float(chainage_from)
-                ct = float(chainage_to)
-    
-                length = ct - cf
-    
-            except (TypeError, ValueError):
-                continue
-    
-            # -------------------------------------------------
-            # LEFT
-            # -------------------------------------------------
-    
-            if side == "left":
-    
-                left_from.append(str(chainage_from))
-                left_to.append(str(chainage_to))
-                left_lengths.append(length)
-    
-            # -------------------------------------------------
-            # RIGHT
-            # -------------------------------------------------
-    
-            elif side == "right":
-    
-                right_from.append(str(chainage_from))
-                right_to.append(str(chainage_to))
-                right_lengths.append(length)
-    
         # =================================================
-        # LEFT NCG -> ROW 19
+        # LEFT NCG - ROW 19
         # =================================================
     
-        target_sheet["C19"] = "; ".join(left_from)
-        target_sheet["D19"] = "; ".join(left_to)
+        target_sheet["C19"] = (
+            '=IFERROR(TEXTJOIN("; ",TRUE,'
+            'FILTER(\'Repeat Details\'!F$2:F$500,'
+            '(TRIM(\'Repeat Details\'!B$2:B$500)="NCG")*'
+            '(LOWER(TRIM(\'Repeat Details\'!E$2:E$500))="left"),'
+            '""'
+            ')),"")'
+        )
+    
+        target_sheet["D19"] = (
+            '=IFERROR(TEXTJOIN("; ",TRUE,'
+            'FILTER(\'Repeat Details\'!G$2:G$500,'
+            '(TRIM(\'Repeat Details\'!B$2:B$500)="NCG")*'
+            '(LOWER(TRIM(\'Repeat Details\'!E$2:E$500))="left"),'
+            '""'
+            ')),"")'
+        )
     
         target_sheet["E19"] = (
-            sum(left_lengths)
-            if left_lengths
-            else 0
+            '=SUMPRODUCT('
+            '(TRIM(\'Repeat Details\'!B$2:B$500)="NCG")*'
+            '(LOWER(TRIM(\'Repeat Details\'!E$2:E$500))="left")*'
+            '(IFERROR(VALUE(\'Repeat Details\'!G$2:G$500),0)-'
+            'IFERROR(VALUE(\'Repeat Details\'!F$2:F$500),0))'
+            ')'
         )
     
         # =================================================
-        # RIGHT NCG -> ROW 20
+        # RIGHT NCG - ROW 20
         # =================================================
     
-        target_sheet["C20"] = "; ".join(right_from)
-        target_sheet["D20"] = "; ".join(right_to)
+        target_sheet["C20"] = (
+            '=IFERROR(TEXTJOIN("; ",TRUE,'
+            'FILTER(\'Repeat Details\'!F$2:F$500,'
+            '(TRIM(\'Repeat Details\'!B$2:B$500)="NCG")*'
+            '(LOWER(TRIM(\'Repeat Details\'!E$2:E$500))="right"),'
+            '""'
+            ')),"")'
+        )
+    
+        target_sheet["D20"] = (
+            '=IFERROR(TEXTJOIN("; ",TRUE,'
+            'FILTER(\'Repeat Details\'!G$2:G$500,'
+            '(TRIM(\'Repeat Details\'!B$2:B$500)="NCG")*'
+            '(LOWER(TRIM(\'Repeat Details\'!E$2:E$500))="right"),'
+            '""'
+            ')),"")'
+        )
     
         target_sheet["E20"] = (
-            sum(right_lengths)
-            if right_lengths
-            else 0
+            '=SUMPRODUCT('
+            '(TRIM(\'Repeat Details\'!B$2:B$500)="NCG")*'
+            '(LOWER(TRIM(\'Repeat Details\'!E$2:E$500))="right")*'
+            '(IFERROR(VALUE(\'Repeat Details\'!G$2:G$500),0)-'
+            'IFERROR(VALUE(\'Repeat Details\'!F$2:F$500),0))'
+            ')'
         )
     
         # =================================================
-        # Quantity
+        # QUANTITY
         # =================================================
     
         target_sheet["H19"] = (
@@ -492,6 +464,7 @@ class EstimateGenerator:
         target_sheet["H20"] = (
             '=IF(OR(E20="",F20="",G20=""),0,E20*F20*G20)'
         )
+        
     def populate_cghi_repeat(self, repeat_records, start_row=2):
         """
         Write Canal Guidewall Height Increase repeat records
