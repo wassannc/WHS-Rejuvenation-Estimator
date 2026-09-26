@@ -379,83 +379,110 @@ class EstimateGenerator:
 
     def setup_ncg_formulas(self):
         """
-        Dynamically link NCG records from Repeat Details
+        Dynamically link ALL NCG records from Repeat Details
         to Input Data Sheet-T.
     
-        This allows BOTH:
-        1. ODK-generated NCG records
-        2. Manually added NCG records
+        This includes:
+        - ODK-generated NCG rows
+        - Manually added NCG rows
     
-        to automatically appear in Sheet-T.
+        LEFT  -> Row 19
+        RIGHT -> Row 20
         """
     
         target_sheet = self.workbook["Input Data Sheet-T"]
     
-        # =================================================
-        # LEFT NCG - ROW 19
-        # =================================================
+        # =====================================================
+        # LEFT NCG
+        # =====================================================
     
         target_sheet["C19"] = (
-            '=IFERROR(TEXTJOIN("; ",TRUE,'
-            'FILTER(\'Repeat Details\'!F$2:F$500,'
-            '(TRIM(\'Repeat Details\'!B$2:B$500)="NCG")*'
-            '(LOWER(TRIM(\'Repeat Details\'!E$2:E$500))="left"),'
+            '=IFERROR('
+            'TEXTJOIN("; ",TRUE,'
+            'IF(('
+            "'Repeat Details'!$B$2:$B$500=\"NCG\""
+            ')*('
+            "LOWER('Repeat Details'!$E$2:$E$500)=\"left\""
+            '),'
+            "'Repeat Details'!$F$2:$F$500,"
             '""'
-            ')),"")'
+            ')'
+            '),'
+            '""'
+            ')'
         )
     
         target_sheet["D19"] = (
-            '=IFERROR(TEXTJOIN("; ",TRUE,'
-            'FILTER(\'Repeat Details\'!G$2:G$500,'
-            '(TRIM(\'Repeat Details\'!B$2:B$500)="NCG")*'
-            '(LOWER(TRIM(\'Repeat Details\'!E$2:E$500))="left"),'
+            '=IFERROR('
+            'TEXTJOIN("; ",TRUE,'
+            'IF(('
+            "'Repeat Details'!$B$2:$B$500=\"NCG\""
+            ')*('
+            "LOWER('Repeat Details'!$E$2:$E$500)=\"left\""
+            '),'
+            "'Repeat Details'!$G$2:$G$500,"
             '""'
-            ')),"")'
+            ')'
+            '),'
+            '""'
+            ')'
         )
     
         target_sheet["E19"] = (
-            '=SUMPRODUCT('
-            '(TRIM(\'Repeat Details\'!B$2:B$500)="NCG")*'
-            '(LOWER(TRIM(\'Repeat Details\'!E$2:E$500))="left")*'
-            '(IFERROR(VALUE(\'Repeat Details\'!G$2:G$500),0)-'
-            'IFERROR(VALUE(\'Repeat Details\'!F$2:F$500),0))'
+            '=SUMIFS('
+            "'Repeat Details'!$H$2:$H$500,"
+            "'Repeat Details'!$B$2:$B$500,\"NCG\","
+            "'Repeat Details'!$E$2:$E$500,\"left\""
             ')'
         )
     
-        # =================================================
-        # RIGHT NCG - ROW 20
-        # =================================================
+        # =====================================================
+        # RIGHT NCG
+        # =====================================================
     
         target_sheet["C20"] = (
-            '=IFERROR(TEXTJOIN("; ",TRUE,'
-            'FILTER(\'Repeat Details\'!F$2:F$500,'
-            '(TRIM(\'Repeat Details\'!B$2:B$500)="NCG")*'
-            '(LOWER(TRIM(\'Repeat Details\'!E$2:E$500))="right"),'
+            '=IFERROR('
+            'TEXTJOIN("; ",TRUE,'
+            'IF(('
+            "'Repeat Details'!$B$2:$B$500=\"NCG\""
+            ')*('
+            "LOWER('Repeat Details'!$E$2:$E$500)=\"right\""
+            '),'
+            "'Repeat Details'!$F$2:$F$500,"
             '""'
-            ')),"")'
+            ')'
+            '),'
+            '""'
+            ')'
         )
     
         target_sheet["D20"] = (
-            '=IFERROR(TEXTJOIN("; ",TRUE,'
-            'FILTER(\'Repeat Details\'!G$2:G$500,'
-            '(TRIM(\'Repeat Details\'!B$2:B$500)="NCG")*'
-            '(LOWER(TRIM(\'Repeat Details\'!E$2:E$500))="right"),'
+            '=IFERROR('
+            'TEXTJOIN("; ",TRUE,'
+            'IF(('
+            "'Repeat Details'!$B$2:$B$500=\"NCG\""
+            ')*('
+            "LOWER('Repeat Details'!$E$2:$E$500)=\"right\""
+            '),'
+            "'Repeat Details'!$G$2:$G$500,"
             '""'
-            ')),"")'
-        )
-    
-        target_sheet["E20"] = (
-            '=SUMPRODUCT('
-            '(TRIM(\'Repeat Details\'!B$2:B$500)="NCG")*'
-            '(LOWER(TRIM(\'Repeat Details\'!E$2:E$500))="right")*'
-            '(IFERROR(VALUE(\'Repeat Details\'!G$2:G$500),0)-'
-            'IFERROR(VALUE(\'Repeat Details\'!F$2:F$500),0))'
+            ')'
+            '),'
+            '""'
             ')'
         )
     
-        # =================================================
+        target_sheet["E20"] = (
+            '=SUMIFS('
+            "'Repeat Details'!$H$2:$H$500,"
+            "'Repeat Details'!$B$2:$B$500,\"NCG\","
+            "'Repeat Details'!$E$2:$E$500,\"right\""
+            ')'
+        )
+    
+        # =====================================================
         # QUANTITY
-        # =================================================
+        # =====================================================
     
         target_sheet["H19"] = (
             '=IF(OR(E19="",F19="",G19=""),0,E19*F19*G19)'
