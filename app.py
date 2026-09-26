@@ -451,12 +451,10 @@ if st.button(
         # -----------------------------------------
 
         estimator.setup_gwr_formulas()
-
         estimator.setup_cghi_formulas()
-
         estimator.setup_gwbjl_formulas()
-
         estimator.setup_ltcb_formulas()
+        estimator.setup_ncg_formulas()
 
 
     except Exception as e:
