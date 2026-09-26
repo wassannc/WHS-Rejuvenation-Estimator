@@ -297,7 +297,10 @@ class EstimateGenerator:
             sheet.cell(
                 output_row,
                 8
-            ).value = length
+            ).value = (
+                f'=IF(OR(F{output_row}="",G{output_row}=""),"",'
+                f'G{output_row}-F{output_row})'
+            )
     
             # --------------------------------------------------
             # Collect for Sheet-T
