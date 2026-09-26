@@ -421,7 +421,7 @@ class EstimateGenerator:
             '=IFERROR(TEXTJOIN("; ",TRUE,'
             'FILTER(\'Repeat Details\'!G$2:G$500,'
             '(\'Repeat Details\'!B$2:B$500="NCG")*'
-            '(\'Repeat Details\'!E$2:E$500,"right"))),"")'
+            '(\'Repeat Details\'!E$2:E$500="right"))),"")'
         )
     
         target_sheet["E20"] = (
