@@ -262,6 +262,63 @@ class EstimateGenerator:
             output_row += 1
     
         return output_row
+        
+    def setup_ncg_formulas(self):
+        """
+        Dynamically link NCG records from Repeat Details
+        to Input Data Sheet-T.
+    
+        LEFT NCG  -> Row 19
+        RIGHT NCG -> Row 20
+        """
+    
+        target_sheet = self.workbook["Input Data Sheet-T"]
+    
+        # LEFT NCG
+        target_sheet["C19"] = (
+            '=IFERROR(TEXTJOIN("; ",TRUE,'
+            'FILTER(\'Repeat Details\'!F$2:F$500,'
+            '(\'Repeat Details\'!B$2:B$500="NCG")*'
+            '(\'Repeat Details\'!E$2:E$500="left"))),"")'
+        )
+    
+        target_sheet["D19"] = (
+            '=IFERROR(TEXTJOIN("; ",TRUE,'
+            'FILTER(\'Repeat Details\'!G$2:G$500,'
+            '(\'Repeat Details\'!B$2:B$500="NCG")*'
+            '(\'Repeat Details\'!E$2:E$500="left"))),"")'
+        )
+    
+        target_sheet["E19"] = (
+            '=SUMIFS(\'Repeat Details\'!H$2:H$500,'
+            '\'Repeat Details\'!B$2:B$500,"NCG",'
+            '\'Repeat Details\'!E$2:E$500,"left")'
+        )
+    
+        # RIGHT NCG
+        target_sheet["C20"] = (
+            '=IFERROR(TEXTJOIN("; ",TRUE,'
+            'FILTER(\'Repeat Details\'!F$2:F$500,'
+            '(\'Repeat Details\'!B$2:B$500="NCG")*'
+            '(\'Repeat Details\'!E$2:E$500="right"))),"")'
+        )
+    
+        target_sheet["D20"] = (
+            '=IFERROR(TEXTJOIN("; ",TRUE,'
+            'FILTER(\'Repeat Details\'!G$2:G$500,'
+            '(\'Repeat Details\'!B$2:B$500="NCG")*'
+            '(\'Repeat Details\'!E$2:E$500,"right"))),"")'
+        )
+    
+        target_sheet["E20"] = (
+            '=SUMIFS(\'Repeat Details\'!H$2:H$500,'
+            '\'Repeat Details\'!B$2:B$500,"NCG",'
+            '\'Repeat Details\'!E$2:E$500,"right")'
+        )
+    
+        # Quantity
+        target_sheet["H19"] = '=E19*F19*G19'
+        target_sheet["H20"] = '=E20*F20*G20'
 
     def populate_cghi_repeat(self, repeat_records, start_row=2):
         """
@@ -310,7 +367,11 @@ class EstimateGenerator:
             except (ValueError, TypeError):
                 length = 0
             
-            sheet.cell(output_row, 8).value = length
+            sheet.cell(
+                output_row, 8
+            ).value = (
+                f'=IF(OR(F{output_row}="",G{output_row}=""),"",G{output_row}-F{output_row})'
+            )
     
             output_row += 1
     
