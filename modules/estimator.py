@@ -392,15 +392,15 @@ class EstimateGenerator:
         target_sheet["C19"] = (
             '=IFERROR(TEXTJOIN("; ",TRUE,'
             'FILTER(\'Repeat Details\'!F$2:F$500,'
-            '(\'Repeat Details\'!B$2:B$500="NCG")*'
-            '(\'Repeat Details\'!E$2:E$500="left"))),"")'
+            '(TRIM(\'Repeat Details\'!B$2:B$500)="NCG")*'
+            '(TRIM(\'Repeat Details\'!E$2:E$500)="left"))),"")'
         )
     
         target_sheet["D19"] = (
             '=IFERROR(TEXTJOIN("; ",TRUE,'
             'FILTER(\'Repeat Details\'!G$2:G$500,'
-            '(\'Repeat Details\'!B$2:B$500="NCG")*'
-            '(\'Repeat Details\'!E$2:E$500="left"))),"")'
+            '(TRIM(\'Repeat Details\'!B$2:B$500)="NCG")*'
+            '(TRIM(\'Repeat Details\'!E$2:E$500)="left"))),"")'
         )
     
         target_sheet["E19"] = (
@@ -413,15 +413,15 @@ class EstimateGenerator:
         target_sheet["C20"] = (
             '=IFERROR(TEXTJOIN("; ",TRUE,'
             'FILTER(\'Repeat Details\'!F$2:F$500,'
-            '(\'Repeat Details\'!B$2:B$500="NCG")*'
-            '(\'Repeat Details\'!E$2:E$500="right"))),"")'
+            '(TRIM(\'Repeat Details\'!B$2:B$500)="NCG")*'
+            '(TRIM(\'Repeat Details\'!E$2:E$500)="right"))),"")'
         )
     
         target_sheet["D20"] = (
             '=IFERROR(TEXTJOIN("; ",TRUE,'
             'FILTER(\'Repeat Details\'!G$2:G$500,'
-            '(\'Repeat Details\'!B$2:B$500="NCG")*'
-            '(\'Repeat Details\'!E$2:E$500="right"))),"")'
+            '(TRIM(\'Repeat Details\'!B$2:B$500)="NCG")*'
+            '(TRIM(\'Repeat Details\'!E$2:E$500)="right"))),"")'
         )
     
         target_sheet["E20"] = (
