@@ -461,12 +461,12 @@ class EstimateGenerator:
     
         target_sheet["C19"] = (
             '=IFERROR(TEXTJOIN("; ",TRUE,'
-            "'Repeat Details'!J2:J500),\"\")"
+            "'Repeat Details'!J2:J500),"")'
         )
-    
+        
         target_sheet["D19"] = (
             '=IFERROR(TEXTJOIN("; ",TRUE,'
-            "'Repeat Details'!K2:K500),\"\")"
+            "'Repeat Details'!K2:K500),"")'
         )
     
         target_sheet["E19"] = (
