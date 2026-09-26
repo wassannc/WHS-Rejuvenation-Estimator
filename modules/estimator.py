@@ -386,47 +386,79 @@ class EstimateGenerator:
     
         Compatible with Excel 2019 and later.
         Uses helper columns J:M instead of FILTER().
+    
+        Repeat Details:
+            F = Chainage From
+            G = Chainage To
+            H = Length
+            J = Left NCG From
+            K = Left NCG To
+            L = Right NCG From
+            M = Right NCG To
+    
+        Input Data Sheet-T:
+            Row 19 = Left NCG
+            Row 20 = Right NCG
         """
     
         target_sheet = self.workbook["Input Data Sheet-T"]
         repeat_sheet = self.workbook["Repeat Details"]
     
-        # -------------------------------------------------
-        # HELPER FORMULAS IN REPEAT DETAILS
-        # -------------------------------------------------
+        # =========================================================
+        # REPEAT DETAILS - FORMULAS
+        # =========================================================
     
         for row in range(2, 501):
     
-            # H = Length
+            # -----------------------------------------------------
+            # H = LENGTH
+            # Chainage To - Chainage From
+            # -----------------------------------------------------
+    
             repeat_sheet.cell(row, 8).value = (
                 f'=IF(OR(F{row}="",G{row}=""),"",G{row}-F{row})'
             )
     
-            # J = Left NCG From
+            # -----------------------------------------------------
+            # J = LEFT NCG - CHAINAGE FROM
+            # -----------------------------------------------------
+    
             repeat_sheet.cell(row, 10).value = (
                 f'=IF(AND($B{row}="NCG",LOWER($E{row})="left"),$F{row},"")'
             )
     
-            # K = Left NCG To
+            # -----------------------------------------------------
+            # K = LEFT NCG - CHAINAGE TO
+            # -----------------------------------------------------
+    
             repeat_sheet.cell(row, 11).value = (
                 f'=IF(AND($B{row}="NCG",LOWER($E{row})="left"),$G{row},"")'
             )
     
-            # L = Right NCG From
+            # -----------------------------------------------------
+            # L = RIGHT NCG - CHAINAGE FROM
+            # -----------------------------------------------------
+    
             repeat_sheet.cell(row, 12).value = (
                 f'=IF(AND($B{row}="NCG",LOWER($E{row})="right"),$F{row},"")'
             )
     
-            # M = Right NCG To
+            # -----------------------------------------------------
+            # M = RIGHT NCG - CHAINAGE TO
+            # -----------------------------------------------------
+    
             repeat_sheet.cell(row, 13).value = (
                 f'=IF(AND($B{row}="NCG",LOWER($E{row})="right"),$G{row},"")'
             )
     
-        # -------------------------------------------------
+        # =========================================================
         # INPUT DATA SHEET-T
-        # -------------------------------------------------
+        # =========================================================
     
-        # LEFT NCG
+        # ---------------------------------------------------------
+        # LEFT NCG - ROW 19
+        # ---------------------------------------------------------
+    
         target_sheet["C19"] = (
             '=IFERROR(TEXTJOIN("; ",TRUE,'
             "'Repeat Details'!J2:J500),\"\")"
@@ -445,7 +477,10 @@ class EstimateGenerator:
             ')'
         )
     
-        # RIGHT NCG
+        # ---------------------------------------------------------
+        # RIGHT NCG - ROW 20
+        # ---------------------------------------------------------
+    
         target_sheet["C20"] = (
             '=IFERROR(TEXTJOIN("; ",TRUE,'
             "'Repeat Details'!L2:L500),\"\")"
@@ -464,9 +499,9 @@ class EstimateGenerator:
             ')'
         )
     
-        # -------------------------------------------------
+        # =========================================================
         # QUANTITY
-        # -------------------------------------------------
+        # =========================================================
     
         target_sheet["H19"] = "=E19*F19*G19"
         target_sheet["H20"] = "=E20*F20*G20"
