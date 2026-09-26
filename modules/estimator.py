@@ -499,6 +499,20 @@ class EstimateGenerator:
             )
     
             output_row += 1
+            
+        # =================================================
+        # WRITE NCG CHAINAGES DIRECTLY TO INPUT DATA SHEET-T
+        # =================================================
+
+        # LEFT NCG - Row 19
+        target_sheet["C19"] = "; ".join(left_from)
+        target_sheet["D19"] = "; ".join(left_to)
+        target_sheet["E19"] = sum(left_lengths) if left_lengths else 0
+
+        # RIGHT NCG - Row 20
+        target_sheet["C20"] = "; ".join(right_from)
+        target_sheet["D20"] = "; ".join(right_to)
+        target_sheet["E20"] = sum(right_lengths) if right_lengths else 0
     
         # ---------------------------------------------
         # ---------------------------------------------
