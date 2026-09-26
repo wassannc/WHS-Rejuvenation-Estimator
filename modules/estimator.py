@@ -381,70 +381,108 @@ class EstimateGenerator:
         """
         Link NCG records from Repeat Details to Input Data Sheet-T.
     
-        Designed for compatibility with:
-        - Excel 2019
-        - Excel 2021
-        - Excel 2024
-        - Microsoft 365
+        Compatible with:
+            - Excel 2019
+            - Excel 2021
+            - Excel 2024
+            - Microsoft 365
+    
+        Does NOT use FILTER() or dynamic-array formulas.
     
         LEFT NCG  -> Row 19
         RIGHT NCG -> Row 20
         """
     
+        repeat_sheet = self.workbook["Repeat Details"]
         target_sheet = self.workbook["Input Data Sheet-T"]
     
         # =========================================================
-        # LEFT NCG
+        # HELPER COLUMNS IN REPEAT DETAILS
         # =========================================================
+        #
+        # J = Left NCG Chainage From
+        # K = Left NCG Chainage To
+        # L = Right NCG Chainage From
+        # M = Right NCG Chainage To
+        #
+        # These formulas are row-by-row, so they also respond when
+        # the user manually edits/adds NCG records.
+        # =========================================================
+    
+        for row in range(2, 501):
+    
+            # LEFT NCG - Chainage From
+            repeat_sheet.cell(row, 10).value = (
+                f'=IF(AND($B{row}="NCG",'
+                f'LOWER($E{row})="left"),'
+                f'$F{row},"")'
+            )
+    
+            # LEFT NCG - Chainage To
+            repeat_sheet.cell(row, 11).value = (
+                f'=IF(AND($B{row}="NCG",'
+                f'LOWER($E{row})="left"),'
+                f'$G{row},"")'
+            )
+    
+            # RIGHT NCG - Chainage From
+            repeat_sheet.cell(row, 12).value = (
+                f'=IF(AND($B{row}="NCG",'
+                f'LOWER($E{row})="right"),'
+                f'$F{row},"")'
+            )
+    
+            # RIGHT NCG - Chainage To
+            repeat_sheet.cell(row, 13).value = (
+                f'=IF(AND($B{row}="NCG",'
+                f'LOWER($E{row})="right"),'
+                f'$G{row},"")'
+            )
+    
+        # =========================================================
+        # INPUT DATA SHEET-T
+        # =========================================================
+    
+        # ---------------------------------------------------------
+        # LEFT NCG -> ROW 19
+        # ---------------------------------------------------------
     
         target_sheet["C19"] = (
             '=IFERROR(TEXTJOIN("; ",TRUE,'
-            'IF(('
-            "'Repeat Details'!$B$2:$B$500=\"NCG\")*("
-            "LOWER('Repeat Details'!$E$2:$E$500)=\"left\"),"
-            "'Repeat Details'!$F$2:$F$500,\"\")),\"\")"
+            "'Repeat Details'!J2:J500),\"\")"
         )
     
         target_sheet["D19"] = (
             '=IFERROR(TEXTJOIN("; ",TRUE,'
-            'IF(('
-            "'Repeat Details'!$B$2:$B$500=\"NCG\")*("
-            "LOWER('Repeat Details'!$E$2:$E$500)=\"left\"),"
-            "'Repeat Details'!$G$2:$G$500,\"\")),\"\")"
+            "'Repeat Details'!K2:K500),\"\")"
         )
     
         target_sheet["E19"] = (
             '=SUMIFS('
-            "'Repeat Details'!$H$2:$H$500,"
-            "'Repeat Details'!$B$2:$B$500,\"NCG\","
-            "'Repeat Details'!$E$2:$E$500,\"left\")"
+            "'Repeat Details'!H2:H500,"
+            "'Repeat Details'!B2:B500,\"NCG\","
+            "'Repeat Details'!E2:E500,\"left\")"
         )
     
-        # =========================================================
-        # RIGHT NCG
-        # =========================================================
+        # ---------------------------------------------------------
+        # RIGHT NCG -> ROW 20
+        # ---------------------------------------------------------
     
         target_sheet["C20"] = (
             '=IFERROR(TEXTJOIN("; ",TRUE,'
-            'IF(('
-            "'Repeat Details'!$B$2:$B$500=\"NCG\")*("
-            "LOWER('Repeat Details'!$E$2:$E$500)=\"right\"),"
-            "'Repeat Details'!$F$2:$F$500,\"\")),\"\")"
+            "'Repeat Details'!L2:L500),\"\")"
         )
     
         target_sheet["D20"] = (
             '=IFERROR(TEXTJOIN("; ",TRUE,'
-            'IF(('
-            "'Repeat Details'!$B$2:$B$500=\"NCG\")*("
-            "LOWER('Repeat Details'!$E$2:$E$500)=\"right\"),"
-            "'Repeat Details'!$G$2:$G$500,\"\")),\"\")"
+            "'Repeat Details'!M2:M500),\"\")"
         )
     
         target_sheet["E20"] = (
             '=SUMIFS('
-            "'Repeat Details'!$H$2:$H$500,"
-            "'Repeat Details'!$B$2:$B$500,\"NCG\","
-            "'Repeat Details'!$E$2:$E$500,\"right\")"
+            "'Repeat Details'!H2:H500,"
+            "'Repeat Details'!B2:B500,\"NCG\","
+            "'Repeat Details'!E2:E500,\"right\")"
         )
     
         # =========================================================
