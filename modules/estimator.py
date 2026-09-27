@@ -560,7 +560,7 @@ class EstimateGenerator:
             "'Repeat Details'!E2:E500,\"left\""
             ')'
         )
-    
+        
         target_sheet["E20"] = (
             '=SUMIFS('
             "'Repeat Details'!H2:H500,"
