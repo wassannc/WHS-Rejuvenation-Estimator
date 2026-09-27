@@ -459,9 +459,15 @@ class EstimateGenerator:
         # LEFT NCG - ROW 19
         # ---------------------------------------------------------
     
-        target_sheet["C19"] = '=IFERROR(TEXTJOIN("; ",TRUE,\'Repeat Details\'!J2:J500),"")'
+        target_sheet["C19"] = (
+            '=TEXTJOIN("; ",TRUE,'
+            "'Repeat Details'!J2:J500)"
+        )
         
-        target_sheet["D19"] = '=IFERROR(TEXTJOIN("; ",TRUE,\'Repeat Details\'!K2:K500),"")'
+        target_sheet["D19"] = (
+            '=TEXTJOIN("; ",TRUE,'
+            "'Repeat Details'!K2:K500)"
+        )
     
         target_sheet["E19"] = (
             '=SUMIFS('
@@ -475,9 +481,15 @@ class EstimateGenerator:
         # RIGHT NCG - ROW 20
         # ---------------------------------------------------------
     
-        target_sheet["C20"] = '=IFERROR(TEXTJOIN("; ",TRUE,\'Repeat Details\'!L2:L500),"")'
+        target_sheet["C20"] = (
+            '=TEXTJOIN("; ",TRUE,'
+            "'Repeat Details'!L2:L500)"
+        )
     
-        target_sheet["D20"] = '=IFERROR(TEXTJOIN("; ",TRUE,\'Repeat Details\'!M2:M500),"")'
+        target_sheet["D20"] = (
+            '=TEXTJOIN("; ",TRUE,'
+            "'Repeat Details'!M2:M500)"
+        )
     
         target_sheet["E20"] = (
             '=SUMIFS('
