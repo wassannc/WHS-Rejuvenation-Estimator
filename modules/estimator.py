@@ -169,7 +169,12 @@ class EstimateGenerator:
             )
     
             output_row += 1
-    
+        # LENGTH FORMULA FOR ALL REPEAT DETAILS ROWS
+        for row in range(2, 501):
+            sheet.cell(row, 8).value = (
+                f'=IF(OR(F{row}="",G{row}=""),"",G{row}-F{row})'
+            )
+        
         return output_row
     
     def populate_ncg_repeat(self, repeat_records, start_row=2):
