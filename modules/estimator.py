@@ -160,11 +160,13 @@ class EstimateGenerator:
                 output_row, 7
             ).value = chainage_to
     
-            # IMPORTANT:
-            # Write numeric value, NOT Excel formula
+            # Keep this as an Excel formula so manual additions
+            # in Repeat Details are also calculated automatically.
             sheet.cell(
                 output_row, 8
-            ).value = length
+            ).value = (
+                f'=IF(OR(F{output_row}="",G{output_row}=""),"",G{output_row}-F{output_row})'
+            )
     
             output_row += 1
     
