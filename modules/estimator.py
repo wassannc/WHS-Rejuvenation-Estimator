@@ -415,26 +415,73 @@ class EstimateGenerator:
                 f'=IF(OR(F{row}="",G{row}=""),"",G{row}-F{row})'
             )
         
-            # J = Left NCG From
-            repeat_sheet.cell(row, 10).value = (
-                f'=IF(AND($B{row}="NCG",LOWER($E{row})="left"),$F{row},"")'
-            )
-        
-            # K = Left NCG To
-            repeat_sheet.cell(row, 11).value = (
-                f'=IF(AND($B{row}="NCG",LOWER($E{row})="left"),$G{row},"")'
-            )
-        
-            # L = Right NCG From
-            repeat_sheet.cell(row, 12).value = (
-                f'=IF(AND($B{row}="NCG",LOWER($E{row})="right"),$F{row},"")'
-            )
-        
-            # M = Right NCG To
-            repeat_sheet.cell(row, 13).value = (
-                f'=IF(AND($B{row}="NCG",LOWER($E{row})="right"),$G{row},"")'
-            )
-        
+            # -------------------------------------------------
+            # CUMULATIVE NCG CHAINAGE HELPERS
+            # Excel 2019 compatible
+            # -------------------------------------------------
+            
+            for row in range(2, 501):
+            
+                # J = LEFT NCG FROM
+                if row == 2:
+                    repeat_sheet.cell(row, 10).value = (
+                        f'=IF(AND($B{row}="NCG",LOWER($E{row})="left"),'
+                        f'IF($F{row}="","",TEXT($F{row},"0.0")),"")'
+                    )
+                else:
+                    repeat_sheet.cell(row, 10).value = (
+                        f'=IF(AND($B{row}="NCG",LOWER($E{row})="left"),'
+                        f'IF($F{row}="",$J{row-1},'
+                        f'IF($J{row-1}="","",'
+                        f'IF($J{row-1}="",TEXT($F{row},"0.0"),'
+                        f'$J{row-1}&", "&TEXT($F{row},"0.0")))),'
+                        f'$J{row-1})'
+                    )
+            
+                # K = LEFT NCG TO
+                if row == 2:
+                    repeat_sheet.cell(row, 11).value = (
+                        f'=IF(AND($B{row}="NCG",LOWER($E{row})="left"),'
+                        f'IF($G{row}="","",TEXT($G{row},"0.0")),"")'
+                    )
+                else:
+                    repeat_sheet.cell(row, 11).value = (
+                        f'=IF(AND($B{row}="NCG",LOWER($E{row})="left"),'
+                        f'IF($G{row}="",$K{row-1},'
+                        f'IF($K{row-1}="","",'
+                        f'$K{row-1}&", "&TEXT($G{row},"0.0"))),'
+                        f'$K{row-1})'
+                    )
+            
+                # L = RIGHT NCG FROM
+                if row == 2:
+                    repeat_sheet.cell(row, 12).value = (
+                        f'=IF(AND($B{row}="NCG",LOWER($E{row})="right"),'
+                        f'IF($F{row}="","",TEXT($F{row},"0.0")),"")'
+                    )
+                else:
+                    repeat_sheet.cell(row, 12).value = (
+                        f'=IF(AND($B{row}="NCG",LOWER($E{row})="right"),'
+                        f'IF($F{row}="",$L{row-1},'
+                        f'IF($L{row-1}="","",'
+                        f'$L{row-1}&", "&TEXT($F{row},"0.0"))),'
+                        f'$L{row-1})'
+                    )
+            
+                # M = RIGHT NCG TO
+                if row == 2:
+                    repeat_sheet.cell(row, 13).value = (
+                        f'=IF(AND($B{row}="NCG",LOWER($E{row})="right"),'
+                        f'IF($G{row}="","",TEXT($G{row},"0.0")),"")'
+                    )
+                else:
+                    repeat_sheet.cell(row, 13).value = (
+                        f'=IF(AND($B{row}="NCG",LOWER($E{row})="right"),'
+                        f'IF($G{row}="",$M{row-1},'
+                        f'IF($M{row-1}="","",'
+                        f'$M{row-1}&", "&TEXT($G{row},"0.0"))),'
+                        f'$M{row-1})'
+                    ) 
         
         # =========================================================
         # RUNNING NCG CHAINAGE TEXT
