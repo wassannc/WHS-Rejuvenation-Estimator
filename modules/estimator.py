@@ -407,49 +407,85 @@ class EstimateGenerator:
         # =========================================================
         # REPEAT DETAILS - FORMULAS
         # =========================================================
-    
+
         for row in range(2, 501):
-    
-            # -----------------------------------------------------
-            # H = LENGTH
-            # Chainage To - Chainage From
-            # -----------------------------------------------------
-    
+        
+            # H = Length
             repeat_sheet.cell(row, 8).value = (
                 f'=IF(OR(F{row}="",G{row}=""),"",G{row}-F{row})'
             )
-    
-            # -----------------------------------------------------
-            # J = LEFT NCG - CHAINAGE FROM
-            # -----------------------------------------------------
-    
+        
+            # J = Left NCG From
             repeat_sheet.cell(row, 10).value = (
                 f'=IF(AND($B{row}="NCG",LOWER($E{row})="left"),$F{row},"")'
             )
-    
-            # -----------------------------------------------------
-            # K = LEFT NCG - CHAINAGE TO
-            # -----------------------------------------------------
-    
+        
+            # K = Left NCG To
             repeat_sheet.cell(row, 11).value = (
                 f'=IF(AND($B{row}="NCG",LOWER($E{row})="left"),$G{row},"")'
             )
-    
-            # -----------------------------------------------------
-            # L = RIGHT NCG - CHAINAGE FROM
-            # -----------------------------------------------------
-    
+        
+            # L = Right NCG From
             repeat_sheet.cell(row, 12).value = (
                 f'=IF(AND($B{row}="NCG",LOWER($E{row})="right"),$F{row},"")'
             )
-    
-            # -----------------------------------------------------
-            # M = RIGHT NCG - CHAINAGE TO
-            # -----------------------------------------------------
-    
+        
+            # M = Right NCG To
             repeat_sheet.cell(row, 13).value = (
                 f'=IF(AND($B{row}="NCG",LOWER($E{row})="right"),$G{row},"")'
             )
+        
+        
+        # =========================================================
+        # RUNNING NCG CHAINAGE TEXT
+        # EXCEL 2019 + 2024 COMPATIBLE
+        # =========================================================
+        
+        for row in range(2, 501):
+        
+            # N = Left NCG From - combined
+            if row == 2:
+                repeat_sheet.cell(row, 14).value = (
+                    f'=IF(J{row}="","",J{row})'
+                )
+            else:
+                repeat_sheet.cell(row, 14).value = (
+                    f'=IF(J{row}="",N{row-1},'
+                    f'IF(N{row-1}="",J{row},N{row-1}&"; "&J{row}))'
+                )
+        
+            # O = Left NCG To - combined
+            if row == 2:
+                repeat_sheet.cell(row, 15).value = (
+                    f'=IF(K{row}="","",K{row})'
+                )
+            else:
+                repeat_sheet.cell(row, 15).value = (
+                    f'=IF(K{row}="",O{row-1},'
+                    f'IF(O{row-1}="",K{row},O{row-1}&"; "&K{row}))'
+                )
+        
+            # P = Right NCG From - combined
+            if row == 2:
+                repeat_sheet.cell(row, 16).value = (
+                    f'=IF(L{row}="","",L{row})'
+                )
+            else:
+                repeat_sheet.cell(row, 16).value = (
+                    f'=IF(L{row}="",P{row-1},'
+                    f'IF(P{row-1}="",L{row},P{row-1}&"; "&L{row}))'
+                )
+        
+            # Q = Right NCG To - combined
+            if row == 2:
+                repeat_sheet.cell(row, 17).value = (
+                    f'=IF(M{row}="","",M{row})'
+                )
+            else:
+                repeat_sheet.cell(row, 17).value = (
+                    f'=IF(M{row}="",Q{row-1},'
+                    f'IF(Q{row-1}="",M{row},Q{row-1}&"; "&M{row}))'
+                )
     
         # =========================================================
         # INPUT DATA SHEET-T
@@ -459,36 +495,23 @@ class EstimateGenerator:
         # LEFT NCG - ROW 19
         # ---------------------------------------------------------
     
-        target_sheet["C19"] = (
-            '=TEXTJOIN("; ",TRUE,'
-            "'Repeat Details'!J2:J500)"
-        )
+        target_sheet["C19"] = "='Repeat Details'!N500"
         
-        target_sheet["D19"] = (
-            '=TEXTJOIN("; ",TRUE,'
-            "'Repeat Details'!K2:K500)"
-        )
+        target_sheet["D19"] = "='Repeat Details'!O500"
+        # ---------------------------------------------------------
+        # RIGHT NCG - ROW 20
+        # ---------------------------------------------------------
     
+        target_sheet["C20"] = "='Repeat Details'!P500"
+    
+        target_sheet["D20"] = "='Repeat Details'!Q500"
+
         target_sheet["E19"] = (
             '=SUMIFS('
             "'Repeat Details'!H2:H500,"
             "'Repeat Details'!B2:B500,\"NCG\","
             "'Repeat Details'!E2:E500,\"left\""
             ')'
-        )
-    
-        # ---------------------------------------------------------
-        # RIGHT NCG - ROW 20
-        # ---------------------------------------------------------
-    
-        target_sheet["C20"] = (
-            '=TEXTJOIN("; ",TRUE,'
-            "'Repeat Details'!L2:L500)"
-        )
-    
-        target_sheet["D20"] = (
-            '=TEXTJOIN("; ",TRUE,'
-            "'Repeat Details'!M2:M500)"
         )
     
         target_sheet["E20"] = (
