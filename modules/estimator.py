@@ -1252,35 +1252,36 @@ class EstimateGenerator:
                 repeat_sheet.cell(row, 5).value or ""
             ).strip().lower()
     
-            chain_from = repeat_sheet.cell(
+           chain_from = repeat_sheet.cell(
                 row, 6
             ).value
-    
+            
             chain_to = repeat_sheet.cell(
                 row, 7
             ).value
-    
-            length = repeat_sheet.cell(
-                row, 8
-            ).value
-    
+            
             # -----------------------------------------
-            # Convert safely
+            # Convert chainages safely
             # -----------------------------------------
-    
+            
             try:
                 cf = float(chain_from)
             except (ValueError, TypeError):
                 cf = None
-    
+            
             try:
                 ct = float(chain_to)
             except (ValueError, TypeError):
                 ct = None
-    
-            try:
-                length = float(length)
-            except (ValueError, TypeError):
+            
+            # -----------------------------------------
+            # Calculate length from chainages
+            # Do NOT read H because H contains an Excel formula
+            # -----------------------------------------
+            
+            if cf is not None and ct is not None:
+                length = ct - cf
+            else:
                 length = 0.0
     
             # -----------------------------------------
