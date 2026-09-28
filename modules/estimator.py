@@ -1252,7 +1252,7 @@ class EstimateGenerator:
                 repeat_sheet.cell(row, 5).value or ""
             ).strip().lower()
     
-           chain_from = repeat_sheet.cell(
+            chain_from = repeat_sheet.cell(
                 row, 6
             ).value
             
