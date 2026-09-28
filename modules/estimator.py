@@ -1360,48 +1360,18 @@ class EstimateGenerator:
         target_sheet["E41"] = left_length
     
         # -----------------------------------------
-        # Calculate Qty
+        # GWR LEFT -> Row 41
         # -----------------------------------------
     
-        try:
-            breadth_right = float(
-                target_sheet["F40"].value or 0
-            )
-        except (ValueError, TypeError):
-            breadth_right = 0
-    
-        try:
-            depth_right = float(
-                target_sheet["G40"].value or 0
-            )
-        except (ValueError, TypeError):
-            depth_right = 0
-    
-        try:
-            breadth_left = float(
-                target_sheet["F41"].value or 0
-            )
-        except (ValueError, TypeError):
-            breadth_left = 0
-    
-        try:
-            depth_left = float(
-                target_sheet["G41"].value or 0
-            )
-        except (ValueError, TypeError):
-            depth_left = 0
-    
-        target_sheet["H40"] = (
-            right_length
-            * breadth_right
-            * depth_right
+        target_sheet["C41"] = format_chainages(
+            left_from
         )
     
-        target_sheet["H41"] = (
-            left_length
-            * breadth_left
-            * depth_left
+        target_sheet["D41"] = format_chainages(
+            left_to
         )
+    
+        target_sheet["E41"] = left_length
         
     def setup_cghi_formulas(self):
         """
