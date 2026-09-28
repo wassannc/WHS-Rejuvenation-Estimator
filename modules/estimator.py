@@ -1220,8 +1220,8 @@ class EstimateGenerator:
         RIGHT GWR -> Row 40
         LEFT GWR  -> Row 41
     
-        Reads numeric values directly from Repeat Details.
-        No Excel helper formulas are required.
+        Chainage and length are read/calculated directly
+        from Repeat Details.
         """
     
         repeat_sheet = self.workbook["Repeat Details"]
@@ -1255,37 +1255,36 @@ class EstimateGenerator:
             chain_from = repeat_sheet.cell(
                 row, 6
             ).value
-            
+    
             chain_to = repeat_sheet.cell(
                 row, 7
             ).value
-            
+    
             # -----------------------------------------
             # Convert chainages safely
             # -----------------------------------------
-            
+    
             try:
                 cf = float(chain_from)
             except (ValueError, TypeError):
                 cf = None
-            
+    
             try:
                 ct = float(chain_to)
             except (ValueError, TypeError):
                 ct = None
-            
+    
             # -----------------------------------------
             # Calculate length from chainages
-            # Do NOT read H because H contains an Excel formula
             # -----------------------------------------
-            
+    
             if cf is not None and ct is not None:
                 length = ct - cf
             else:
                 length = 0.0
     
             # -----------------------------------------
-            # RIGHT
+            # RIGHT GWR
             # -----------------------------------------
     
             if side == "right":
@@ -1299,7 +1298,7 @@ class EstimateGenerator:
                 right_length += length
     
             # -----------------------------------------
-            # LEFT
+            # LEFT GWR
             # -----------------------------------------
     
             elif side == "left":
@@ -1361,7 +1360,7 @@ class EstimateGenerator:
         target_sheet["E41"] = left_length
     
         # -----------------------------------------
-        # Calculate Qty directly
+        # Calculate Qty
         # -----------------------------------------
     
         try:
