@@ -1219,49 +1219,64 @@ class EstimateGenerator:
         RIGHT GWR -> Row 40
         LEFT GWR  -> Row 41
     
-        Uses helper columns N:Q so that:
-        - manual additions in Repeat Details are picked up automatically
-        - Excel 2019 is supported
-        - existing NCG helper columns J:M are not disturbed
-        - H40/H41 remain the existing Excel Qty formulas
+        Dedicated helper columns:
+            Z  = Right From
+            AA = Right To
+            AB = Left From
+            AC = Left To
+    
+        Manual additions in Repeat Details are also included.
+        H40/H41 remain the Excel formulas from the template.
         """
     
         repeat_sheet = self.workbook["Repeat Details"]
         target_sheet = self.workbook["Input Data Sheet-T"]
     
         # =========================================================
-        # HELPER COLUMNS IN REPEAT DETAILS
-        # N = Right From
-        # O = Right To
-        # P = Left From
-        # Q = Left To
+        # GWR HELPER COLUMNS
+        # =========================================================
+        #
+        # Z  = Right From
+        # AA = Right To
+        # AB = Left From
+        # AC = Left To
+        #
+        # These columns are dedicated ONLY to GWR.
         # =========================================================
     
         for row in range(2, 501):
     
+            # -----------------------------------------------------
             # RIGHT GWR - FROM
-            repeat_sheet.cell(row, 14).value = (
+            # -----------------------------------------------------
+            repeat_sheet.cell(row, 26).value = (
                 f'=IF(AND($B{row}="GWR",'
                 f'LOWER($E{row})="right"),'
                 f'$F{row},"")'
             )
     
+            # -----------------------------------------------------
             # RIGHT GWR - TO
-            repeat_sheet.cell(row, 15).value = (
+            # -----------------------------------------------------
+            repeat_sheet.cell(row, 27).value = (
                 f'=IF(AND($B{row}="GWR",'
                 f'LOWER($E{row})="right"),'
                 f'$G{row},"")'
             )
     
+            # -----------------------------------------------------
             # LEFT GWR - FROM
-            repeat_sheet.cell(row, 16).value = (
+            # -----------------------------------------------------
+            repeat_sheet.cell(row, 28).value = (
                 f'=IF(AND($B{row}="GWR",'
                 f'LOWER($E{row})="left"),'
                 f'$F{row},"")'
             )
     
+            # -----------------------------------------------------
             # LEFT GWR - TO
-            repeat_sheet.cell(row, 17).value = (
+            # -----------------------------------------------------
+            repeat_sheet.cell(row, 29).value = (
                 f'=IF(AND($B{row}="GWR",'
                 f'LOWER($E{row})="left"),'
                 f'$G{row},"")'
@@ -1272,17 +1287,17 @@ class EstimateGenerator:
         # =========================================================
     
         # ---------------------------------------------------------
-        # RIGHT GWR - ROW 40
+        # RIGHT GWR -> ROW 40
         # ---------------------------------------------------------
     
         target_sheet["C40"] = (
             '=IFERROR(TEXTJOIN("; ",TRUE,'
-            "'Repeat Details'!N2:N500),\"\")"
+            "'Repeat Details'!Z2:Z500),"")"
         )
     
         target_sheet["D40"] = (
             '=IFERROR(TEXTJOIN("; ",TRUE,'
-            "'Repeat Details'!O2:O500),\"\")"
+            "'Repeat Details'!AA2:AA500),"")'
         )
     
         target_sheet["E40"] = (
@@ -1294,17 +1309,17 @@ class EstimateGenerator:
         )
     
         # ---------------------------------------------------------
-        # LEFT GWR - ROW 41
+        # LEFT GWR -> ROW 41
         # ---------------------------------------------------------
     
         target_sheet["C41"] = (
             '=IFERROR(TEXTJOIN("; ",TRUE,'
-            "'Repeat Details'!P2:P500),\"\")"
+            "'Repeat Details'!AB2:AB500),"")"
         )
     
         target_sheet["D41"] = (
             '=IFERROR(TEXTJOIN("; ",TRUE,'
-            "'Repeat Details'!Q2:Q500),\"\")"
+            "'Repeat Details'!AC2:AC500),"")'
         )
     
         target_sheet["E41"] = (
@@ -1316,15 +1331,20 @@ class EstimateGenerator:
         )
     
         # =========================================================
-        # IMPORTANT:
-        # DO NOT WRITE H40 OR H41 HERE.
+        # DO NOT TOUCH H40 / H41
+        # =========================================================
         #
-        # They must remain the formulas already present
-        # in the Excel template:
+        # The Excel template already contains:
         #
         # H40 = E40*F40*G40
         # H41 = E41*F41*G41
+        #
+        # Keep those formulas.
         # =========================================================
+    
+        # Hide GWR helper columns
+        for column in ["Z", "AA", "AB", "AC"]:
+            repeat_sheet.column_dimensions[column].hidden = True
         
     def setup_cghi_formulas(self):
         """
@@ -1463,50 +1483,6 @@ class EstimateGenerator:
         for column in ["P", "Q", "R", "S", "T", "U"]:
             repeat_sheet.column_dimensions[column].hidden = True
             
-    def write_final_gwr_values(self):
-        """
-        Write consolidated GWR values directly into Input Data Sheet-T.
-        Avoids Excel formula/cached-value issues.
-        """
-    
-        repeat_sheet = self.workbook["Repeat Details"]
-        target_sheet = self.workbook["Input Data Sheet-T"]
-    
-        # -------------------------------------------------
-        # Read final helper values
-        # -------------------------------------------------
-        right_from = repeat_sheet["J500"].value
-        right_to = repeat_sheet["K500"].value
-        right_length = repeat_sheet["L500"].value
-    
-        left_from = repeat_sheet["M500"].value
-        left_to = repeat_sheet["N500"].value
-        left_length = repeat_sheet["O500"].value
-    
-        # -------------------------------------------------
-        # Write RIGHT GWR → Row 40
-        # -------------------------------------------------
-        target_sheet["C40"] = right_from if right_from not in (None, "") else ""
-        target_sheet["D40"] = right_to if right_to not in (None, "") else ""
-        target_sheet["E40"] = right_length if right_length not in (None, "") else 0
-    
-        # -------------------------------------------------
-        # Write LEFT GWR → Row 41
-        # -------------------------------------------------
-        target_sheet["C41"] = left_from if left_from not in (None, "") else ""
-        target_sheet["D41"] = left_to if left_to not in (None, "") else ""
-        target_sheet["E41"] = left_length if left_length not in (None, "") else 0
-    
-        # -------------------------------------------------
-        # Qty = Length × Breadth × Depth
-        # -------------------------------------------------
-        target_sheet["H40"] = (
-            f'=IF(OR(E40="",F40="",G40=""),0,E40*F40*G40)'
-        )
-    
-        target_sheet["H41"] = (
-            f'=IF(OR(E41="",F41="",G41=""),0,E41*F41*G41)'
-        )
     def save(self, filename):
 
         os.makedirs("output", exist_ok=True)
