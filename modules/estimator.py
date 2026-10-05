@@ -1235,47 +1235,31 @@ class EstimateGenerator:
         # =========================================================
         # GWR HELPER COLUMNS
         # =========================================================
-        #
-        # Z  = Right From
-        # AA = Right To
-        # AB = Left From
-        # AC = Left To
-        #
-        # These columns are dedicated ONLY to GWR.
-        # =========================================================
     
         for row in range(2, 501):
     
-            # -----------------------------------------------------
             # RIGHT GWR - FROM
-            # -----------------------------------------------------
             repeat_sheet.cell(row, 26).value = (
                 f'=IF(AND($B{row}="GWR",'
                 f'LOWER($E{row})="right"),'
                 f'$F{row},"")'
             )
     
-            # -----------------------------------------------------
             # RIGHT GWR - TO
-            # -----------------------------------------------------
             repeat_sheet.cell(row, 27).value = (
                 f'=IF(AND($B{row}="GWR",'
                 f'LOWER($E{row})="right"),'
                 f'$G{row},"")'
             )
     
-            # -----------------------------------------------------
             # LEFT GWR - FROM
-            # -----------------------------------------------------
             repeat_sheet.cell(row, 28).value = (
                 f'=IF(AND($B{row}="GWR",'
                 f'LOWER($E{row})="left"),'
                 f'$F{row},"")'
             )
     
-            # -----------------------------------------------------
             # LEFT GWR - TO
-            # -----------------------------------------------------
             repeat_sheet.cell(row, 29).value = (
                 f'=IF(AND($B{row}="GWR",'
                 f'LOWER($E{row})="left"),'
@@ -1292,12 +1276,12 @@ class EstimateGenerator:
     
         target_sheet["C40"] = (
             '=IFERROR(TEXTJOIN("; ",TRUE,'
-            "'Repeat Details'!Z2:Z500),"")"
+            "'Repeat Details'!Z2:Z500),\"\")"
         )
     
         target_sheet["D40"] = (
             '=IFERROR(TEXTJOIN("; ",TRUE,'
-            "'Repeat Details'!AA2:AA500),"")'
+            "'Repeat Details'!AA2:AA500),\"\")"
         )
     
         target_sheet["E40"] = (
@@ -1314,12 +1298,12 @@ class EstimateGenerator:
     
         target_sheet["C41"] = (
             '=IFERROR(TEXTJOIN("; ",TRUE,'
-            "'Repeat Details'!AB2:AB500),"")"
+            "'Repeat Details'!AB2:AB500),\"\")"
         )
     
         target_sheet["D41"] = (
             '=IFERROR(TEXTJOIN("; ",TRUE,'
-            "'Repeat Details'!AC2:AC500),"")'
+            "'Repeat Details'!AC2:AC500),\"\")"
         )
     
         target_sheet["E41"] = (
