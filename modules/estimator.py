@@ -1214,121 +1214,150 @@ class EstimateGenerator:
     
     def setup_gwr_formulas(self):
         """
-        Link GWR records from Repeat Details to Input Data Sheet-T.
+        Consolidate GWR records from Repeat Details
+        into Input Data Sheet-T.
     
         RIGHT GWR -> Row 40
         LEFT GWR  -> Row 41
     
-        Dedicated helper columns:
-            Z  = Right From
-            AA = Right To
-            AB = Left From
-            AC = Left To
+        Includes both:
+        1. ODK-generated GWR records
+        2. Manually added GWR records in Repeat Details
     
-        Manual additions in Repeat Details are also included.
-        H40/H41 remain the Excel formulas from the template.
+        H40/H41 remain Excel formulas.
         """
     
         repeat_sheet = self.workbook["Repeat Details"]
         target_sheet = self.workbook["Input Data Sheet-T"]
     
-        # =========================================================
-        # GWR HELPER COLUMNS
-        # =========================================================
+        # ---------------------------------------------------------
+        # Separate storage for RIGHT and LEFT
+        # ---------------------------------------------------------
+    
+        right_from = []
+        right_to = []
+        right_length = 0.0
+    
+        left_from = []
+        left_to = []
+        left_length = 0.0
+    
+        # ---------------------------------------------------------
+        # Read Repeat Details
+        # ---------------------------------------------------------
     
         for row in range(2, 501):
     
-            # RIGHT GWR - FROM
-            repeat_sheet.cell(row, 26).value = (
-                f'=IF(AND($B{row}="GWR",'
-                f'LOWER($E{row})="right"),'
-                f'$F{row},"")'
-            )
+            repeat_group = repeat_sheet.cell(row, 2).value
     
-            # RIGHT GWR - TO
-            repeat_sheet.cell(row, 27).value = (
-                f'=IF(AND($B{row}="GWR",'
-                f'LOWER($E{row})="right"),'
-                f'$G{row},"")'
-            )
+            if str(repeat_group or "").strip().upper() != "GWR":
+                continue
     
-            # LEFT GWR - FROM
-            repeat_sheet.cell(row, 28).value = (
-                f'=IF(AND($B{row}="GWR",'
-                f'LOWER($E{row})="left"),'
-                f'$F{row},"")'
-            )
+            side = str(
+                repeat_sheet.cell(row, 5).value or ""
+            ).strip().lower()
     
-            # LEFT GWR - TO
-            repeat_sheet.cell(row, 29).value = (
-                f'=IF(AND($B{row}="GWR",'
-                f'LOWER($E{row})="left"),'
-                f'$G{row},"")'
-            )
+            chain_from = repeat_sheet.cell(row, 6).value
+            chain_to = repeat_sheet.cell(row, 7).value
     
-        # =========================================================
-        # INPUT DATA SHEET-T
-        # =========================================================
+            # -----------------------------------------------------
+            # Convert chainages
+            # -----------------------------------------------------
+    
+            try:
+                cf = float(chain_from)
+            except (ValueError, TypeError):
+                cf = None
+    
+            try:
+                ct = float(chain_to)
+            except (ValueError, TypeError):
+                ct = None
+    
+            # -----------------------------------------------------
+            # Calculate length directly from F and G
+            #
+            # Important:
+            # Do NOT read H because H may contain an Excel formula.
+            # -----------------------------------------------------
+    
+            if cf is not None and ct is not None:
+                length = ct - cf
+            else:
+                length = 0.0
+    
+            # -----------------------------------------------------
+            # RIGHT GWR
+            # -----------------------------------------------------
+    
+            if side == "right":
+    
+                if cf is not None:
+                    right_from.append(cf)
+    
+                if ct is not None:
+                    right_to.append(ct)
+    
+                right_length += length
+    
+            # -----------------------------------------------------
+            # LEFT GWR
+            # -----------------------------------------------------
+    
+            elif side == "left":
+    
+                if cf is not None:
+                    left_from.append(cf)
+    
+                if ct is not None:
+                    left_to.append(ct)
+    
+                left_length += length
     
         # ---------------------------------------------------------
-        # RIGHT GWR -> ROW 40
+        # Format chainage values
         # ---------------------------------------------------------
     
-        target_sheet["C40"] = (
-            '=IFERROR(TEXTJOIN("; ",TRUE,'
-            "'Repeat Details'!Z2:Z500),\"\")"
-        )
+        def format_chainages(values):
     
-        target_sheet["D40"] = (
-            '=IFERROR(TEXTJOIN("; ",TRUE,'
-            "'Repeat Details'!AA2:AA500),\"\")"
-        )
+            if not values:
+                return ""
     
-        target_sheet["E40"] = (
-            '=SUMIFS('
-            "'Repeat Details'!H2:H500,"
-            "'Repeat Details'!B2:B500,\"GWR\","
-            "'Repeat Details'!E2:E500,\"right\""
-            ')'
-        )
+            result = []
+    
+            for value in values:
+    
+                if float(value).is_integer():
+                    result.append(str(int(value)))
+                else:
+                    result.append(f"{value:.1f}")
+    
+            return "; ".join(result)
     
         # ---------------------------------------------------------
-        # LEFT GWR -> ROW 41
+        # RIGHT GWR -> Sheet-T Row 40
         # ---------------------------------------------------------
     
-        target_sheet["C41"] = (
-            '=IFERROR(TEXTJOIN("; ",TRUE,'
-            "'Repeat Details'!AB2:AB500),\"\")"
-        )
+        target_sheet["C40"] = format_chainages(right_from)
+        target_sheet["D40"] = format_chainages(right_to)
+        target_sheet["E40"] = right_length
     
-        target_sheet["D41"] = (
-            '=IFERROR(TEXTJOIN("; ",TRUE,'
-            "'Repeat Details'!AC2:AC500),\"\")"
-        )
+        # ---------------------------------------------------------
+        # LEFT GWR -> Sheet-T Row 41
+        # ---------------------------------------------------------
     
-        target_sheet["E41"] = (
-            '=SUMIFS('
-            "'Repeat Details'!H2:H500,"
-            "'Repeat Details'!B2:B500,\"GWR\","
-            "'Repeat Details'!E2:E500,\"left\""
-            ')'
-        )
+        target_sheet["C41"] = format_chainages(left_from)
+        target_sheet["D41"] = format_chainages(left_to)
+        target_sheet["E41"] = left_length
     
-        # =========================================================
-        # DO NOT TOUCH H40 / H41
-        # =========================================================
-        #
-        # The Excel template already contains:
-        #
-        # H40 = E40*F40*G40
-        # H41 = E41*F41*G41
-        #
-        # Keep those formulas.
-        # =========================================================
+        # ---------------------------------------------------------
+        # IMPORTANT:
+        # Keep Qty as Excel formulas
+        # ---------------------------------------------------------
     
-        # Hide GWR helper columns
-        for column in ["Z", "AA", "AB", "AC"]:
-            repeat_sheet.column_dimensions[column].hidden = True
+        target_sheet["H40"] = '=IF(OR(E40="",F40="",G40=""),0,E40*F40*G40)'
+    
+        target_sheet["H41"] = '=IF(OR(E41="",F41="",G41=""),0,E41*F41*G41)'
         
     def setup_cghi_formulas(self):
         """
