@@ -762,31 +762,6 @@ class EstimateGenerator:
     
             output_row += 1
     
-        # ---------------------------------------------
-        # Populate Sheet-T from Repeat Details
-        # ---------------------------------------------
-        
-        # Right canal - Row 50
-        target_sheet["C50"] = "='Repeat Details'!J500"
-        target_sheet["D50"] = "='Repeat Details'!K500"
-        
-        target_sheet["E50"] = (
-            '=SUMIFS(\'Repeat Details\'!$H$2:$H$500,'
-            '\'Repeat Details\'!$B$2:$B$500,"GWBJL",'
-            '\'Repeat Details\'!$E$2:$E$500,"right")'
-        )
-                            
-        # Left canal - Row 51
-        target_sheet["C51"] = "='Repeat Details'!L500"
-        target_sheet["D51"] = "='Repeat Details'!M500"
-        
-        target_sheet["E51"] = (
-            '=SUMIFS(\'Repeat Details\'!$H$2:$H$500,'
-            '\'Repeat Details\'!$B$2:$B$500,"GWBJL",'
-            '\'Repeat Details\'!$E$2:$E$500,"left")'
-        )
-
-    
         return output_row
 
     def populate_ltcb_repeat(self, repeat_records, start_row=2):
