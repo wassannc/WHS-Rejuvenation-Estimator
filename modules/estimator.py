@@ -1198,150 +1198,78 @@ class EstimateGenerator:
     
     def setup_gwr_formulas(self):
         """
-        Consolidate GWR records from Repeat Details
-        into Input Data Sheet-T.
+        Link GWR records from Repeat Details to Input Data Sheet-T.
     
         RIGHT GWR -> Row 40
         LEFT GWR  -> Row 41
     
-        Includes both:
-        1. ODK-generated GWR records
-        2. Manually added GWR records in Repeat Details
-    
-        H40/H41 remain Excel formulas.
+        Uses Excel formulas so manually added GWR records
+        in Repeat Details are also included automatically.
         """
     
-        repeat_sheet = self.workbook["Repeat Details"]
         target_sheet = self.workbook["Input Data Sheet-T"]
     
         # ---------------------------------------------------------
-        # Separate storage for RIGHT and LEFT
+        # RIGHT GWR -> ROW 40
         # ---------------------------------------------------------
     
-        right_from = []
-        right_to = []
-        right_length = 0.0
+        target_sheet["C40"] = (
+            '=IFERROR(TEXTJOIN("; ",TRUE,'
+            'FILTER(\'Repeat Details\'!F$2:F$500,'
+            '(\'Repeat Details\'!B$2:B$500="GWR")*'
+            '(LOWER(\'Repeat Details\'!E$2:E$500)="right"))),"")'
+        )
     
-        left_from = []
-        left_to = []
-        left_length = 0.0
+        target_sheet["D40"] = (
+            '=IFERROR(TEXTJOIN("; ",TRUE,'
+            'FILTER(\'Repeat Details\'!G$2:G$500,'
+            '(\'Repeat Details\'!B$2:B$500="GWR")*'
+            '(LOWER(\'Repeat Details\'!E$2:E$500)="right"))),"")'
+        )
     
-        # ---------------------------------------------------------
-        # Read Repeat Details
-        # ---------------------------------------------------------
-    
-        for row in range(2, 501):
-    
-            repeat_group = repeat_sheet.cell(row, 2).value
-    
-            if str(repeat_group or "").strip().upper() != "GWR":
-                continue
-    
-            side = str(
-                repeat_sheet.cell(row, 5).value or ""
-            ).strip().lower()
-    
-            chain_from = repeat_sheet.cell(row, 6).value
-            chain_to = repeat_sheet.cell(row, 7).value
-    
-            # -----------------------------------------------------
-            # Convert chainages
-            # -----------------------------------------------------
-    
-            try:
-                cf = float(chain_from)
-            except (ValueError, TypeError):
-                cf = None
-    
-            try:
-                ct = float(chain_to)
-            except (ValueError, TypeError):
-                ct = None
-    
-            # -----------------------------------------------------
-            # Calculate length directly from F and G
-            #
-            # Important:
-            # Do NOT read H because H may contain an Excel formula.
-            # -----------------------------------------------------
-    
-            if cf is not None and ct is not None:
-                length = ct - cf
-            else:
-                length = 0.0
-    
-            # -----------------------------------------------------
-            # RIGHT GWR
-            # -----------------------------------------------------
-    
-            if side == "right":
-    
-                if cf is not None:
-                    right_from.append(cf)
-    
-                if ct is not None:
-                    right_to.append(ct)
-    
-                right_length += length
-    
-            # -----------------------------------------------------
-            # LEFT GWR
-            # -----------------------------------------------------
-    
-            elif side == "left":
-    
-                if cf is not None:
-                    left_from.append(cf)
-    
-                if ct is not None:
-                    left_to.append(ct)
-    
-                left_length += length
+        target_sheet["E40"] = (
+            '=SUMIFS('
+            '\'Repeat Details\'!H$2:H$500,'
+            '\'Repeat Details\'!B$2:B$500,"GWR",'
+            '\'Repeat Details\'!E$2:E$500,"right")'
+        )
     
         # ---------------------------------------------------------
-        # Format chainage values
+        # LEFT GWR -> ROW 41
         # ---------------------------------------------------------
     
-        def format_chainages(values):
+        target_sheet["C41"] = (
+            '=IFERROR(TEXTJOIN("; ",TRUE,'
+            'FILTER(\'Repeat Details\'!F$2:F$500,'
+            '(\'Repeat Details\'!B$2:B$500="GWR")*'
+            '(LOWER(\'Repeat Details\'!E$2:E$500)="left"))),"")'
+        )
     
-            if not values:
-                return ""
+        target_sheet["D41"] = (
+            '=IFERROR(TEXTJOIN("; ",TRUE,'
+            'FILTER(\'Repeat Details\'!G$2:G$500,'
+            '(\'Repeat Details\'!B$2:B$500="GWR")*'
+            '(LOWER(\'Repeat Details\'!E$2:E$500)="left"))),"")'
+        )
     
-            result = []
-    
-            for value in values:
-    
-                if float(value).is_integer():
-                    result.append(str(int(value)))
-                else:
-                    result.append(f"{value:.1f}")
-    
-            return "; ".join(result)
-    
-        # ---------------------------------------------------------
-        # RIGHT GWR -> Sheet-T Row 40
-        # ---------------------------------------------------------
-    
-        target_sheet["C40"] = format_chainages(right_from)
-        target_sheet["D40"] = format_chainages(right_to)
-        target_sheet["E40"] = right_length
+        target_sheet["E41"] = (
+            '=SUMIFS('
+            '\'Repeat Details\'!H$2:H$500,'
+            '\'Repeat Details\'!B$2:B$500,"GWR",'
+            '\'Repeat Details\'!E$2:E$500,"left")'
+        )
     
         # ---------------------------------------------------------
-        # LEFT GWR -> Sheet-T Row 41
+        # Quantity formulas
         # ---------------------------------------------------------
     
-        target_sheet["C41"] = format_chainages(left_from)
-        target_sheet["D41"] = format_chainages(left_to)
-        target_sheet["E41"] = left_length
+        target_sheet["H40"] = (
+            '=IF(OR(E40="",F40="",G40=""),0,E40*F40*G40)'
+        )
     
-        # ---------------------------------------------------------
-        # IMPORTANT:
-        # Keep Qty as Excel formulas
-        # ---------------------------------------------------------
-    
-        target_sheet["H40"] = '=IF(OR(E40="",F40="",G40=""),0,E40*F40*G40)'
-    
-        target_sheet["H41"] = '=IF(OR(E41="",F41="",G41=""),0,E41*F41*G41)'
+        target_sheet["H41"] = (
+            '=IF(OR(E41="",F41="",G41=""),0,E41*F41*G41)'
+        )
         
     def setup_cghi_formulas(self):
         """
