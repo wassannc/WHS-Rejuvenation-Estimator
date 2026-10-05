@@ -8,7 +8,6 @@ from openpyxl import load_workbook
 from config import TEMPLATE_FILE
 from modules.mapper import FieldMapper
 
-
 class EstimateGenerator:
 
     def __init__(self):
